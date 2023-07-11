@@ -42,11 +42,11 @@ class bookS():
                 print("Enter Only Numbers")
             else:
               flag=False
-              if purchase==1 and items<row[5]:
+              if purchase==1 and items<row[4]:
                 print(items*row[5])
-              elif purchase==2 and items<row[5]:
+              elif purchase==2 and items<row[4]:
                print(items*row[5])
-              elif purchase==3 and items<row[5]:
+              elif purchase==3 and items<row[4]:
                 print(items*row[5])
               elif purchase>3 or purchase<0 and items>row[5]:
                 flag=True
