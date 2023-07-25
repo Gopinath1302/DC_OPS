@@ -1,5 +1,6 @@
 from server import db,cursor
 from books import bookS
+import getpass
 import re
 
 
@@ -17,7 +18,7 @@ class auth():
     @staticmethod
     def login():
         entered_username = input("Enter your username: ")
-        entered_password = input("Enter your password: ")
+        entered_password = getpass.getpass("Enter your password: ")
         if auth.authenticate_user(entered_username, entered_password):
             print("Login successful. Proceed with further actions.")
             object1 = bookS()
