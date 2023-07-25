@@ -48,8 +48,9 @@ class bookS():
                print(items*row[5])
               elif purchase==3 and items<row[4]:
                 print(items*row[5])
-              elif purchase>3 or purchase<0 and items>row[5]:
+              else:
                 flag=True
+                print("Enter the details again correctly")
                 continue
               flag=False
           break
