@@ -8,7 +8,8 @@ Reviewed On         :
 """
 
 
-from user.welcome import Enter
+from user.welcome import Welcome
 
-welcome = Enter()
-welcome.enters()
+if __name__ == "__main__":
+    welcome = Welcome()
+    welcome.show_login_choices()

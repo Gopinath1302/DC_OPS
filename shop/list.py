@@ -1,18 +1,15 @@
-import mysql.connector
+from db.db_connector import get_db_connection
 
 from shop.booking import Booking
+from user.user import User
+
 
 booking = Booking()
 
 
 class PetList:
     def __init__(self):
-        self.db_connection = mysql.connector.connect(
-            host="127.0.0.15",
-            user="root",
-            password="root",
-            database="pet_adoption",
-        )
+        self.db_connection = get_db_connection()
 
     def display_pet_list(self):
         # Fetch the list of available pets from the database and display them

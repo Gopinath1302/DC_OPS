@@ -1,64 +1,68 @@
-from user.user import User
-from shop.list import PetList
-
-
+import sys
 import datetime
-import mysql.connector
 
-
-customer = User()
-
-
-class Enter:
-    def enters(self):
-        # Check if the user wants to buy a pet
-        buy_pet = input("Do you want to buy a pet? (y/n): ")
-        if buy_pet.lower() == "y":
-            customer.log_in()
-
-            # Process payment
-            customer.log_out()
-        choice1 = ""
-        choice2 = input(
-            "Thank You for our visit. Press '1' to quit\nPress Enter to Login\n"
-        )
-
-        if choice2 != choice1:
-            raise SystemExit
-        else:
-            customer.log_in()
+import mysql
+from user.user import User, AdminUser
+from db.db_connector import get_db_connection
 
 
 class Welcome:
     def __init__(self):
-        self.db_connection = mysql.connector.connect(
-            host="127.0.0.15",
-            user="root",
-            password="root",
-            database="pet_adoption",
-        )
+        self.db_connection = get_db_connection()
+        self.create_timestamp_login_table_if_not_exists()
 
-    def save_timestamp(self):
-        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
+    def create_timestamp_login_table_if_not_exists(self):
         cursor = self.db_connection.cursor()
-        cursor.execute("USE pet_adoption")
-        print("Using pet_adoption Database")
+        query = """
+        CREATE TABLE IF NOT EXISTS timestamp_login (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            timestamp DATETIME NOT NULL
+        )
+        """
+        try:
+            cursor.execute(query)
+            self.db_connection.commit()
+        except mysql.connector.Error as err:
+            print("Error creating table: {}".format(err))
+        finally:
+            cursor.close()
 
-        query = """CREATE TABLE IF NOT EXISTS timestamp_login (id INT AUTO_INCREMENT PRIMARY KEY, timestamp DATETIME)"""
-        cursor.execute(query)
-        print("Table Created")
-
+    def record_login_timestamp(self):
+        timestamp = datetime.datetime.now()
+        cursor = self.db_connection.cursor()
         query = "INSERT INTO timestamp_login (timestamp) VALUES (%s)"
         values = (timestamp,)
-        cursor.execute(query, values)
-        self.db_connection.commit()
-        cursor.close()
+        try:
+            cursor.execute(query, values)
+            self.db_connection.commit()
+        except mysql.connector.Error as err:
+            print("Error inserting timestamp: {}".format(err))
+        finally:
+            cursor.close()
 
-    def display_welcome_screen(self):
-        print("Welcome to Adams Pet Shop!")
-        self.save_timestamp()
-        customer.create_account()
+    def show_login_choices(self):
+        welcome = Welcome()
+        welcome.record_login_timestamp()
 
+        print("Welcome to Adam's Pet Shop!")
+        print("Please choose:")
+        print("1. Admin Login")
+        print("2. Customer Login")
 
-Welcome().display_welcome_screen()
+        choice = input("Enter your choice (1 or 2): ")
+
+        if choice == "1":
+            from user.user import AdminUser
+
+            admin_user = AdminUser()
+            admin_user.admin_login()
+
+        elif choice == "2":
+            from user.user import User
+
+            user = User()
+            user.customer_login()
+
+        else:
+            print("Invalid choice. Please enter either '1' or '2'.")
+            sys.exit(1)
