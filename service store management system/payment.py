@@ -1,7 +1,7 @@
 # Title              : Service Management system
 # Author             : Agateeswaran K
 # Created on         : 07/02/2023
-# Last Modified Date : 08/07/2023
+# Last Modified Date : 27/07/2023
 # Reviewed by        : Silpa M
 # Reviewed on        : 20/02/2023
 
@@ -17,8 +17,9 @@ from DB_connection import query_execute
 class Payment:
 
     @staticmethod
-    def payment_methods():
-        global card_number, pin
+    def payment_methods(total):
+        card_number = 111
+        pin = 1
         print("_" * 100)
         print("\t\t\t\t\t\t\t\t\t- > Payment < -")
         print("_" * 100, "\n")
@@ -35,22 +36,26 @@ class Payment:
                 print("Type your Bank name\n")
                 bank_name = input()
                 time.sleep(5)
+                print("Loading....")
                 print("Please wait we are redirecting your bank server")
                 print("Enter username: ")
-                print("Enter password: ")
                 username = input()
+                print("Enter password: ")
                 password = input()
+                print("Your making a payment of Rs:", total)
                 print("Enter your Transaction pin")
                 try:
                     pin = int(input())
                 except TypeError:
                     print("invalid entry")
                     if pin == 1234:
+                        print("Loading....")
                         time.sleep(7)
                         print("Thank you For your purchase, visit again")
+                        flag = False
                     else:
                         print("You have entered An incorrect pin\nWill restart your payment")
-                        Payment.payment_methods()
+                        Payment.payment_methods(total)
 
             elif user_choice == 2:
                 try:
@@ -59,6 +64,8 @@ class Payment:
                 except TypeError:
                     print("Invalid entry !\nPlease try to enter a valid choice")
                 if 1000000000000000 < card_number < 9999999999999999:
+                    print("Your making a payment of Rs:", total)
+                    print("Loading....")
                     time.sleep(5)
                     try:
                         print("Enter your pin")
@@ -66,11 +73,13 @@ class Payment:
                     except TypeError:
                         print("Invalid entry !\nPlease try to enter a valid choice")
                     if pin == 1234:
+                        print("Loading....")
                         time.sleep(7)
                         print("Thank you For your purchase, visit again")
+                        flag = False
                     else:
                         print("You have entered An incorrect pin \nWill restart your payment")
-                        Payment.payment_methods()
+                        Payment.payment_methods(total)
 
             elif user_choice == 3:
                 regex = "^[A-Za-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$"
@@ -79,40 +88,39 @@ class Payment:
                     print("Enter your UPI-ID :")
                     upi_id = input()
                     if re.search(rule, upi_id):
-                        flag = False
                         print("Please wait we are redirecting your bank server")
+                        print("Loading....")
                         time.sleep(7)
-                        print("Thank you for your purchase")
+                        print("Your making a payment of Rs:", total)
+                        print("Enter your pin")
+                        try:
+                            pin = int(input())
+                        except TypeError:
+                            print("Invalid entry !\nPlease try to enter a valid choice")
+                        if pin == 1234:
+                            print("Loading....")
+                            time.sleep(7)
+                            print("Thank you For your purchase, visit again")
+                            flag = False
                     else:
                         print("Invalid UPI-Id!\nPlease try  to enter a valid UPI-Id")
-                        Payment.payment_methods()
+                        Payment.payment_methods(total)
 
 
 class Customer(Payment):
-    __services = Service().give_service_list()
-    __service_cost = Service().give_service_price()
+    total = 0
 
     @classmethod
-    def print_service_details(cls, __customer_id):
+    def calculate_total(cls, __customer_id):
         query = "Select sum(price) from service where cus_id = %s;"
         values = (__customer_id,)
         result = query_execute(3, query, values)
         # print(result)
         total = result[0]
-        # print(total)
-        query = "Select service_name, price from service where cus_id = %s;"
-        values = (__customer_id,)
-        result = query_execute(4, query, values)
-        print("\n   Service \t\t\t Price")
-        i = 0
-        for row in result:
-            list1 = row
-            print(list1[0], "\t", list1[1])
-        print("\nYour total service charge is  Rs", total)
-
+        return total
 
     @staticmethod
-    def print_details(name,customer_id):
+    def print_details(name, __customer_id):
         print("_" * 100, "\n\t\t\t\t\t\t\t\t\t", "> Services done <")
         print("_" * 100)
         print("\nYour last Service details are as follows\n")
@@ -121,4 +129,12 @@ class Customer(Payment):
         print("Date: ", x.strftime("%c"))
         print("")
         print("_" * 40, "\n")
-        Customer.print_service_details(customer_id)
+        total = Customer.calculate_total(__customer_id)
+        query = "Select service_name, price from service where cus_id = %s;"
+        values = (__customer_id,)
+        result = query_execute(4, query, values)
+        print("\n   Service \t\t\t Price")
+        for row in result:
+            list1 = row
+            print(list1[0], "\t", list1[1])
+        print("\nYour total service charge is  Rs", total)

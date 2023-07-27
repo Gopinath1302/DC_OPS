@@ -1,7 +1,7 @@
 # Title              : Service Management system
 # Author             : Agateeswaran K
 # Created on         : 07/02/2023
-# Last Modified Date : 08/07/2023
+# Last Modified Date : 27/07/2023
 # Reviewed by        : Silpa M
 # Reviewed on        : 20/02/2023
 
@@ -10,7 +10,7 @@ from user import User
 from serviceitems import Service
 from payment import Payment
 from payment import Customer
-from DB_connection import query_execute
+from DB_connection import query_execute, global_cursor, connection
 
 
 class Home:
@@ -50,7 +50,8 @@ class Home:
             Customer().print_details(name, customer_id)
             Home.dashboard(customer_id)
         elif user_choice == 5:
-            Payment.payment_methods()
+            total = Customer.calculate_total(customer_id)
+            Payment.payment_methods(total)
             Home.dashboard(customer_id)
         elif user_choice == 6:
             Home.sign_out(name)
@@ -70,6 +71,8 @@ class Home:
                     " thanks for using "
                     "this "
                     "application!\n")
+                global_cursor.close()
+                connection.close()
                 quit()
             elif user_choice == 2:
                 Home.dashboard()

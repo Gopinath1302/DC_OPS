@@ -1,7 +1,7 @@
 # Title              : Service Management system
 # Author             : Agateeswaran K
 # Created on         : 07/02/2023
-# Last Modified Date : 08/07/2023
+# Last Modified Date : 27/07/2023
 # Reviewed by        : Silpa M
 # Reviewed on        : 20/02/2023
 
@@ -14,9 +14,9 @@ import hashlib
 
 
 class User:
-    __customer_id: str = ""
-    __username: str = ""
-    __password: str = ""
+    __customer_id: str = "1"
+    __username: str = "sf"
+    __password: str = "fs"
     __phone: int = 0
     __email_id: str = ""
     __address: str = ""
@@ -25,6 +25,7 @@ class User:
     __DOB = ""
     user_choice: int = 0
 
+    # Function to
     @staticmethod
     def get_timestamp(case=0):
         # Get the current timestamp
@@ -51,11 +52,13 @@ class User:
         elif case == 4:
             return time_string
 
+    # Function to convert password into a hash value
     @staticmethod
     def generate_sha256_hash(value):
         sha256_hash = hashlib.sha256(value.encode()).hexdigest()
         return sha256_hash
 
+    # User-defined function to get user's choice
     @staticmethod
     def get_user_choice(prompt, valid_choices):
         while True:
@@ -68,6 +71,7 @@ class User:
             except ValueError:
                 print("Invalid input. Please enter an integer.")
 
+    # User-defined function to validate an existing user
     @staticmethod
     def check_existing_user(value="", case=0):
         result = ""
@@ -83,6 +87,7 @@ class User:
             result = query_execute(3, query, values)
         return result is not None
 
+    # User-defined function to generate Customer_id
     @staticmethod
     def generate_customer_id(username="", phone=""):
         username = re.sub(r"\s+", " ", username)
@@ -90,6 +95,7 @@ class User:
         cus_id = "CUS" + username[:2] + phone[:5]
         return cus_id
 
+    # User-defined function to print User details
     @classmethod
     def print_user_details(cls, __customer_id=""):
         print("_" * 100, "\n\t\t\t\t\t\t\t\t\t- > Details < -")
@@ -114,6 +120,7 @@ class User:
                 print("\t\t", value[i], ".")
         # pass
 
+    # User-defined function to update User details
     @classmethod
     def update_user_details(cls, __customer_id=""):
         global __username, __email_id, __phone, __first_name, __last_name, __DOB, user_choice, __address
@@ -200,6 +207,7 @@ class User:
             elif user_choice == 6:
                 break
 
+    # User-defined function to authenticate the user
     @classmethod
     def sign_in(cls):
         if global_cursor is None:
@@ -238,12 +246,13 @@ class User:
                     flag = False
                     quit()
 
+    # User-defined function to create a user
     @classmethod
     def sign_up(cls):
         global __customer_id, user_choice, __username, __password, __email_id, __phone
         if global_cursor is None:
             raise Exception("Cursor not initialized. Call create_cursor() first.")
-        print("_" * 100, "\n\t\t\t\t\t\t\t\t\t- > Sign-in < -"), \
+        print("_" * 100, "\n\t\t\t\t\t\t\t\t\t- > Sign-Up < -"), \
             print("_" * 100, "\n")
         flag = True
         regex = "(?=.*[a-z])(?=.*[A-Z]).+$"
