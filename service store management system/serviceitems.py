@@ -15,6 +15,7 @@ class Service:
     __service_price = 1000
     __service = "Nominal service Charges"
 
+    # User-defined function to check where a user is eligible to get a service or not
     @staticmethod
     def check_service_eligiblity(customer_id):
         status = True
@@ -32,6 +33,7 @@ class Service:
                 status = True
         return status
 
+    # User-defined function to update a users request into the DB
     @classmethod
     def add_service(cls, __customer_id, date, timestamp, service_id):
         prompt = (
@@ -52,6 +54,7 @@ class Service:
         values = (__customer_id, service_id, service, service_price, date, timestamp)
         query_execute(1, query, values)
 
+    # User-defined function to rise a service request
     @staticmethod
     def rise_service_request(__customer_id,name):
         status = Service.check_service_eligiblity(__customer_id)
@@ -77,6 +80,7 @@ class Service:
             elif user_choice == 2:
                 break
 
+    # User-defined function to generate a service ID
     @staticmethod
     def generate_service_id(__customer_id="", name=""):
         name = re.sub(r"\s+", " ", name)
@@ -87,6 +91,7 @@ class Service:
         return service_id
         # pass
 
+    # User-defined function to perform Timestamping
     @staticmethod
     def get_timestamp(case=0):
         # gets the current timestamp
@@ -124,6 +129,7 @@ class Service:
             return current_year
 
     # Under development
+    # User-defined function to rise a detailed service request
     @staticmethod
     def rise_request(__customer_id=""):
         print("_" * 105, "\n\t\t\t\t\t\t\t\t\t- > Service initiation < -")

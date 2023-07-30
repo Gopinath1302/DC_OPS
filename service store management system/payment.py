@@ -16,6 +16,7 @@ from DB_connection import query_execute
 
 class Payment:
 
+    # User-defined function to get user's card cvv number and authenticate it
     @staticmethod
     def get_ccv():
         status = True
@@ -38,6 +39,7 @@ class Payment:
             flag = not status
         return status
 
+    # User-defined function to get user's card pin
     @staticmethod
     def get_pin():
         pin = 0
@@ -53,6 +55,7 @@ class Payment:
             finally:
                 return pin
 
+    # User-defined function to get user's card pin authenticate it
     @staticmethod
     def validate_pin(pin):
         pin_pattern = '^(?!.*(.).*\1)(?!(?:0123|1234|2345|3456|4567|5678|6789|7890))\d{4}$'
@@ -63,6 +66,7 @@ class Payment:
             status = False
         return status
 
+    # User-defined function to validate a user's card number
     @staticmethod
     def is_luhn_valid(card_number):
         card_number = str(card_number).replace(" ", "")  # Remove any spaces
@@ -80,6 +84,7 @@ class Payment:
         # Check if the checksum is divisible by 10
         return checksum % 10 == 0
 
+    # User-defined function to get user's card number
     @staticmethod
     def get_card_number():
         flag = True
@@ -91,10 +96,12 @@ class Payment:
             flag = not status
         return status
 
+    # User-defined function to print total price from DB
     @staticmethod
     def print_total(total):
         print("Your making a payment of Rs:", total)
 
+    # User-defined function to get user's card cvv expiry date and authenticate it
     @staticmethod
     def get_expiry_date():
         status = True
@@ -131,6 +138,7 @@ class Payment:
             flag = not status
         return status
 
+    # User-defined function to validate user's upi-id
     @staticmethod
     def validate_upi_id(upi_id):
         regex = '^[a-zA-Z0-9._]+@(?!.*\.\.)[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
@@ -140,6 +148,7 @@ class Payment:
         else:
             return False
 
+    # User-defined function to get user's upi-id
     @staticmethod
     def get_upi_id():
         flag = True
@@ -151,6 +160,7 @@ class Payment:
             flag = not status
         return status
 
+    # User-defined function to perform online banking process
     @staticmethod
     def online_banking(total):
         status = False
@@ -186,6 +196,7 @@ class Payment:
 
         return status
 
+    # User-defined function to perform card transactions
     @staticmethod
     def card_transaction(total):
         global status
@@ -203,6 +214,7 @@ class Payment:
             print("You have entered an in valid pin!")
         return status
 
+    # User-defined function to get user's card cvv number and authenticate it
     @staticmethod
     def upi_payment(total):
         global status
@@ -222,6 +234,7 @@ class Payment:
             print("You have entered an in valid pin!")
         return status
 
+    # User-defined function to payment
     @staticmethod
     def payment_methods(total):
         prompt = "_" * 100 + "\n" + "\t" * 9 + "- > Payment < -\n" + "_" * 100 + ("\n1. Net Banking\n2. Credit / Debit "
@@ -247,6 +260,7 @@ class Payment:
 class Customer(Payment):
     total = 0
 
+    # User-defined function to calculate the total price
     @classmethod
     def calculate_total(cls, __customer_id):
         query = "Select sum(price) from service where cus_id = %s and p_status = 'Pending';"
@@ -255,6 +269,7 @@ class Customer(Payment):
         total = result[0]
         return total
 
+    # User-defined function to update the payment status to the DB
     @staticmethod
     def update_payment_status(customer_id, status):
         if status:
@@ -262,6 +277,7 @@ class Customer(Payment):
             values = ('Successful', customer_id)
             query_execute(1, query, values)
 
+    # User-defined function to display the user's Service details
     @staticmethod
     def print_details(name, __customer_id):
         print("_" * 100, "\n\t\t\t\t\t\t\t\t\t", "> Services done <")

@@ -17,6 +17,7 @@ class Home:
     name = ""
     user_choice: int = 1
 
+    # User-defined function to display dashboard
     @staticmethod
     def dashboard(customer_id=""):
         global user_choice
@@ -57,6 +58,7 @@ class Home:
         elif user_choice == 6:
             Home.sign_out(name)
 
+    # User-defined function to sig-out a user
     @classmethod
     def sign_out(cls, name=""):
         global user_choice
@@ -78,6 +80,7 @@ class Home:
             elif user_choice == 2:
                 Home.dashboard()
 
+    # User-defined function to greet and authenticate a user
     @staticmethod
     def greeting():
         global user_choice

@@ -18,6 +18,7 @@ connection = mysql.connector.connect(
 global_cursor = connection.cursor()
 
 
+# User-defined function to perform various query operations
 def query_execute(case, query, values):
     global_cursor.execute(query, values)
     # Case 1 and case 2  for insert and for update respectively

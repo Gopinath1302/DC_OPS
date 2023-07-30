@@ -197,8 +197,8 @@ class User:
         if global_cursor is None:
             raise Exception("Cursor not initialized. Call create_cursor() first.")
         global user_choice, __username, __password, __email_id, __phone, __customer_id
-        print("_" * 100, "\n\t\t\t\t\t\t\t\t\t- > Sign-in < -")
-        print("_" * 100, "\n")
+        print("_" * 105, "\n\t\t\t\t\t\t\t\t\t- > Sign-in < -")
+        print("_" * 105, "\n")
         flag = True
         prompt = ("\n\t\t\t\t\tError!, invalid credentials\nWant retry to signing-in ? or "
                   "exit the"
@@ -323,11 +323,9 @@ class User:
     @classmethod
     def sign_up(cls):
         global __customer_id, user_choice, __username, __password, __email_id, __phone
-        print("_" * 100, "\n\t\t\t\t\t\t\t\t\t- > Sign-Up < -"),
-        print("_" * 100, "\n")
+        print("_" * 105, "\n\t\t\t\t\t\t\t\t\t- > Sign-Up < -"),
+        print("_" * 105, "\n")
         flag = True
-        # regex = "(?=.*[a-z])(?=.*[A-Z]).+$"
-        # rule = re.compile(regex)
         while flag:
             __username = input("Enter the Username:\n")
             flag = User.username_validation(__username)
