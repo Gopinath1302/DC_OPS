@@ -16,7 +16,7 @@ class Service:
     __service = "Nominal service Charges"
 
     @classmethod
-    def add_service(cls, __customer_id, timestamp):
+    def add_service(cls, __customer_id, date, timestamp, service_id):
         global __service, __service_price
         prompt = (
             "Enter the service you need...\n1.Hardware Service\tRs 5000\n2.Software Service\tRs 1500\n3.General "
@@ -32,38 +32,31 @@ class Service:
         elif user_choice == 3:
             __service = "General Service"
             __service_price = 3000
-        query = "insert into service values (%s, %s, %s, %s);"
-        values = (__customer_id, __service, __service_price, timestamp)
+        query = "insert into service values (%s, %s, %s, %s, %s, %s);"
+        values = (__customer_id, service_id, __service, __service_price, date, timestamp)
         query_execute(1, query, values)
 
     @staticmethod
-    def rise_service_request(__customer_id):
+    def rise_service_request(__customer_id,name):
         print("_" * 100, "\n\t\t\t\t\t\t\t\t\t- > Service initiation < -")
         print("_" * 100, "\n")
         timestamp = Service.get_timestamp(2)
-        query = "insert into service values (%s,'Nominal Service',1000,%s);"
-        values = (__customer_id, timestamp)
+        date = Service.get_timestamp(3)
+        service_id = Service.generate_service_id(__customer_id,name)
+        query = "insert into service values ( %s, %s, 'Nominal Service', 1000, %s, %s);"
+        values = (__customer_id, service_id, date, timestamp)
         query_execute(1, query, values)
-        Service.add_service(__customer_id, timestamp)
+        Service.add_service(__customer_id, date, timestamp, service_id)
         valid_choice = [1, 2]
         prompt = "Want to add another service \n 1.Yes or 2.No\n"
         while True:
             user_choice = User.get_user_choice(prompt, valid_choice)
             if user_choice == 1:
                 print("\n")
-                Service.add_service(__customer_id, timestamp)
+                Service.add_service(__customer_id, date, timestamp, service_id)
             elif user_choice == 2:
                 break
 
-    @staticmethod
-    def give_service_list():
-        return Service.__service
-
-    @staticmethod
-    def give_service_price():
-        return Service.__service_price
-
-    # under development
     @staticmethod
     def generate_service_id(__customer_id="", name=""):
         name = re.sub(r"\s+", " ", name)
@@ -76,15 +69,19 @@ class Service:
 
     @staticmethod
     def get_timestamp(case=0):
-        # Get the current timestamp
-        timestamp = datetime.timestamp(datetime.now())
-        # gets current date
+        # gets the current timestamp
+        value = datetime.now()
+        timestamp = datetime.timestamp(value)
+        # gets the current month
+        current_month = value.month
+        # gets the current year
+        current_year = value.year
+        # gets the current date
         value = date.today()
         # Format the datetime object as a string
         dt = datetime.fromtimestamp(timestamp)
         # Format the datetime object as a string
         formatted_datetime = dt.strftime("%Y-%m-%d %H:%M:%S")
-        #
         current_time = datetime.now().time()
         time_string = current_time.strftime("%I:%M:%S %p")
         # function call for timestamp
@@ -99,6 +96,12 @@ class Service:
         # function call for time with local format
         elif case == 4:
             return time_string
+        # function call for time with current month
+        elif case == 5:
+            return current_month
+        # function call for time with current year
+        elif case == 6:
+            return current_year
 
     # Under development
     @staticmethod
