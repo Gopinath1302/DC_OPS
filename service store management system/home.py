@@ -20,9 +20,9 @@ class Home:
     @staticmethod
     def dashboard(customer_id=""):
         global user_choice
-        print("_" * 100)
+        print("_" * 105)
         print("\t\t\t\t\t\t\t\t\t > Dashboard < -")
-        print("_" * 100, "\n")
+        print("_" * 105, "\n")
         query = "Select * from userdata where cus_id=%s;"
         values = (customer_id,)
         result = query_execute(3, query, values)
@@ -51,7 +51,8 @@ class Home:
             Home.dashboard(customer_id)
         elif user_choice == 5:
             total = Customer.calculate_total(customer_id)
-            Payment.payment_methods(total)
+            status = Payment.payment_methods(total)
+            Customer.update_payment_status(customer_id,status)
             Home.dashboard(customer_id)
         elif user_choice == 6:
             Home.sign_out(name)
@@ -59,7 +60,7 @@ class Home:
     @classmethod
     def sign_out(cls, name=""):
         global user_choice
-        print("_" * 100)
+        print("_" * 105)
         flag = True
         valid_choice = [1, 2]
         prompt = "\nExit Application or not ?\n 1.Yes\t2.No\n"
@@ -81,8 +82,8 @@ class Home:
     def greeting():
         global user_choice
         customer_id = ""
-        print("_" * 100, "\n\t\t\t\t\t\t\t- > Welcome to the Application < -")
-        print("_" * 100, "\n")
+        print("_" * 105, "\n\t\t\t\t\t\t\t- > Welcome to the Application < -")
+        print("_" * 105, "\n")
         prompt = "\nExisting User ?\n\t1.Yes\t2.No\n"
         valid_choice = [1, 2]
         user_choice = User.get_user_choice(prompt, valid_choice)

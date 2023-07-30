@@ -20,17 +20,14 @@ global_cursor = connection.cursor()
 
 def query_execute(case, query, values):
     global_cursor.execute(query, values)
-    # for insert
-    if case == 1:
+    # Case 1 and case 2  for insert and for update respectively
+    if case == 1 or case == 2:
         connection.commit()
-    # for update
-    elif case == 2:
-        connection.commit()
-    # for select
+    # Case 3 for select which return single row from DB
     elif case == 3:
         result = global_cursor.fetchone()
         return result
-    # for select multiple rows
+    # Case 4 for select which returns multiple rows from DB
     elif case == 4:
         result = global_cursor.fetchall()
         return result

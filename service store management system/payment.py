@@ -249,12 +249,18 @@ class Customer(Payment):
 
     @classmethod
     def calculate_total(cls, __customer_id):
-        query = ("Select sum(price) from service where timestamp = (select max(timestamp) from service where cus_id = "
-                 "%s);")
+        query = "Select sum(price) from service where cus_id = %s and p_status = 'Pending';"
         values = (__customer_id,)
         result = query_execute(3, query, values)
         total = result[0]
         return total
+
+    @staticmethod
+    def update_payment_status(customer_id, status):
+        if status:
+            query = "update service set  p_status = %s where cus_id = %s"
+            values = ('Successful', customer_id)
+            query_execute(1, query, values)
 
     @staticmethod
     def print_details(name, __customer_id):
@@ -262,18 +268,16 @@ class Customer(Payment):
         print("_" * 100)
         print("\nYour last Service details are as follows\n")
         print("Name: ", name, "\n")
-        # x = datetime.datetime.now()
-        # print("Date: ", x.strftime("%c"), "\n")
         print("_" * 40, "\n")
         total = Customer.calculate_total(__customer_id)
-        query = ("Select service_id, service_name, price from service where timestamp = (select max(timestamp) "
-                 "from service where cus_id = %s);")
+        query = ("Select service_id, service_name, price, p_status from service where cus_id = %s and p_status = "
+                 "'Pending';")
         values = (__customer_id,)
-        print("_" * 57, "\n")
+        print("_" * 68, "\n")
         result = query_execute(4, query, values)
-        print(" Service ID \t\t\t Service \t\t Price")
-        print("_" * 57, "\n")
+        print(" Service ID \t\t\t Service \t\t Price \t\t Payment status")
+        print("_" * 68, "\n")
         for row in result:
             list1 = row
-            print(" ", list1[0], "\t\t", list1[1], "\t", list1[2])
+            print(" ", list1[0], "\t\t", list1[1], "\t", list1[2], "\t\t", list1[3])
         print("\nYour total for last service is Rs", total)

@@ -15,35 +15,55 @@ class Service:
     __service_price = 1000
     __service = "Nominal service Charges"
 
+    @staticmethod
+    def check_service_eligiblity(customer_id):
+        status = True
+        query = "Select sum(price) from service where cus_id = %s and p_status = 'Pending';"
+        result = query_execute(3,query,(customer_id,))
+        try:
+            if result[0] >10500:
+                status = True
+        except TypeError:
+            status = True
+        else:
+            if result[0] > 10000:
+                status = False
+            else:
+                status = True
+        return status
+
     @classmethod
     def add_service(cls, __customer_id, date, timestamp, service_id):
-        global __service, __service_price
         prompt = (
             "Enter the service you need...\n1.Hardware Service\tRs 5000\n2.Software Service\tRs 1500\n3.General "
             "Service\tRs 3000\n")
         valid_choice = [1, 2, 3]
         user_choice = User.get_user_choice(prompt, valid_choice)
         if user_choice == 1:
-            __service = 'Hardware Service'
-            __service_price = 5000
+            service = 'Hardware Service'
+            service_price = 5000
         elif user_choice == 2:
-            __service = "Software Service"
-            __service_price = 1500
+            service = "Software Service"
+            service_price = 1500
         elif user_choice == 3:
-            __service = "General Service"
-            __service_price = 3000
-        query = "insert into service values (%s, %s, %s, %s, %s, %s);"
-        values = (__customer_id, service_id, __service, __service_price, date, timestamp)
+            service = "General Service"
+            service_price = 3000
+        query = "insert into service values (%s, %s, %s, %s, %s, %s, 'Pending');"
+        values = (__customer_id, service_id, service, service_price, date, timestamp)
         query_execute(1, query, values)
 
     @staticmethod
     def rise_service_request(__customer_id,name):
+        status = Service.check_service_eligiblity(__customer_id)
+        if not status:
+            print("We are apologizing to say this, ",name,"\nYou already having too many pending bills \nEnsure you pay the pending bills")
+            return 0
         print("_" * 100, "\n\t\t\t\t\t\t\t\t\t- > Service initiation < -")
         print("_" * 100, "\n")
         timestamp = Service.get_timestamp(2)
         date = Service.get_timestamp(3)
         service_id = Service.generate_service_id(__customer_id,name)
-        query = "insert into service values ( %s, %s, 'Nominal Service', 1000, %s, %s);"
+        query = "insert into service values ( %s, %s, 'Nominal Service', 1000, %s, %s, 'Pending');"
         values = (__customer_id, service_id, date, timestamp)
         query_execute(1, query, values)
         Service.add_service(__customer_id, date, timestamp, service_id)
@@ -106,8 +126,8 @@ class Service:
     # Under development
     @staticmethod
     def rise_request(__customer_id=""):
-        print("_" * 100, "\n\t\t\t\t\t\t\t\t\t- > Service initiation < -")
-        print("_" * 100)
+        print("_" * 105, "\n\t\t\t\t\t\t\t\t\t- > Service initiation < -")
+        print("_" * 105)
         time = Service.get_timestamp(2)
         print("The device name:")
         device_name = input()
@@ -135,32 +155,40 @@ class Service:
         status = "Initiated"
         user_choice = User.get_user_choice(prompt, valid_choice)
         if user_choice == 1:
-            values = (__customer_id, service_id, device_name, model_name, defect_description, usaage, status, time)
+            values = (__customer_id, service_id, device_name, model_name, defect_description, usaage, status, time,'Pending')
             query_execute(1, query, values)
         else:
             prompt = "Do you need to update the details\n\t1.yes\t2.No\n"
             user_choice = User.get_user_choice(prompt, valid_choice)
             if user_choice == 2:
-                values = (__customer_id, service_id, device_name, model_name, defect_description, usaage, status, time)
+                values = (__customer_id, service_id, device_name, model_name, defect_description, usaage, status, time,'Pending')
                 query_execute(1, query, values)
             elif user_choice == 1:
-                prompt = "Which value do you need to update?\n"
+                prompt = "Which details do you need to update?\n\t\t1.Customer ID\t\t2.Service ID\t\t3.Device name\n\t\t4.Model name\t\t5.Defect\t\t6.Usage"
                 valid_choice = [1, 2, 3, 4, 5, 6]
                 user_choice = User.get_user_choice(prompt, valid_choice)
                 if user_choice == 1 or user_choice == 2 or user_choice == 6:
-                    print("Not possible")
+                    print("Not possible!")
                 elif user_choice == 3:
-                    print("Enter the detail to be updated")
+                    print("Enter the Device name to be updated:\n")
                     device_name = input()
                 elif user_choice == 4:
-                    print("Enter the detail to be updated")
+                    print("Enter the Model name to be updated:\n")
                     model_name = input()
                 elif user_choice == 5:
-                    print("Enter the detail to be updated")
-                    defect_description = input()
-                values = (__customer_id, service_id, device_name, model_name, defect_description, usaage, status, time)
+                    prompt = "How do you use the device ?\n\t1.Minimal\t2.Nominal\t3.Extensive\n"
+                    valid_choices = [1, 2, 3]
+                    user_choice = User.get_user_choice(prompt, valid_choices)
+                    if user_choice == 1:
+                        usaage = "Minimal"
+                    elif user_choice == 2:
+                        usaage = "Nominal"
+                    elif user_choice == 3:
+                        usaage = "Extensive"
+
+                values = (__customer_id, service_id, device_name, model_name, defect_description, usaage, status, time,'Pending')
                 query_execute(1, query, values)
-        print("The service request has been raised over technicians will get to the linked address and collect the "
+        print("The service request has been raised. Technicians will get to the linked address and collect the "
               "device with-in 1 or 2 working days\n so please verify the address\n")
         query = "Select * from address where cus_id = %s;"
         values = (__customer_id,)
