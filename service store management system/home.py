@@ -43,7 +43,7 @@ class Home:
             User.update_user_details(customer_id)
             Home.dashboard(customer_id)
         elif user_choice == 3:
-            Service.rise_service_request(customer_id)
+            Service.rise_service_request(customer_id,name)
             # Service.rise_request(customer_id)
             Home.dashboard(customer_id)
         elif user_choice == 4:

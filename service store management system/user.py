@@ -71,22 +71,6 @@ class User:
             except ValueError:
                 print("Invalid input. Please enter an integer.")
 
-    # User-defined function to validate an existing user
-    @staticmethod
-    def check_existing_user(value="", case=0):
-        result = ""
-        values = (value,)
-        if case == 1:
-            query = "Select username from credentials where username=%s;"
-            result = query_execute(3, query, values)
-        elif case == 2:
-            query = "Select username from credentials where phoneno=%s;"
-            result = query_execute(3, query, values)
-        elif case == 3:
-            query = "Select username from credentials where emailid=%s;"
-            result = query_execute(3, query, values)
-        return result is not None
-
     # User-defined function to generate Customer_id
     @staticmethod
     def generate_customer_id(username="", phone=""):
@@ -234,10 +218,8 @@ class User:
                 __customer_id = result[0]
                 credentials = result[2]
                 # print(2)
-                if credentials == hash_value:
-                    print("\n\t\t\t\t\tlogged-in successfully!\n")
-                    return __customer_id
-            except TypeError:
+
+            except:
                 # print(3)
                 user_choice = User.get_user_choice(prompt, valid_choice)
                 if user_choice == 1:
@@ -245,82 +227,148 @@ class User:
                 elif user_choice == 2:
                     flag = False
                     quit()
+            else:
+                if credentials == hash_value:
+                    print("\n\t\t\t\t\tlogged-in successfully!\n")
+                    return __customer_id
+                else:
+                    user_choice = User.get_user_choice(prompt, valid_choice)
+                    if user_choice == 1:
+                        flag = True
+                    elif user_choice == 2:
+                        flag = False
+                        quit()
+
+    # User-defined function to validate an existing user
+    @staticmethod
+    def check_existing_user(value="", case=0):
+        result = ""
+        values = (value,)
+        if case == 1:
+            query = "Select username from credentials where username=%s;"
+            result = query_execute(3, query, values)
+        elif case == 2:
+            query = "Select username from credentials where phoneno=%s;"
+            result = query_execute(3, query, values)
+        elif case == 3:
+            query = "Select username from credentials where emailid=%s;"
+            result = query_execute(3, query, values)
+        return result is not None
+
+    # User-defined function to validate username
+    @staticmethod
+    def username_validation(username):
+        regex = "(?=.*[a-z])(?=.*[A-Z]).+$"
+        rule = re.compile(regex)
+        if re.search(rule, username):
+            result = User.check_existing_user(username, 1)
+            if result:
+                print("This username is already exist")
+                prompt = " 1.Try to enter another username or 2.try log in with that username ?\n"
+                valid_choice = [1, 2]
+                user_choices = User.get_user_choice(prompt, valid_choice)
+                if user_choices == 2:
+                    User.sign_in()
+                else:
+                    return True
+            else:
+                return False
+        else:
+            return True
+
+    # User-defined function to validate password
+    @staticmethod
+    def password_validation(password):
+        regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!#%*?&]{6,20}$"
+        rule = re.compile(regex)
+        if re.search(rule, password):
+            return True
+        else:
+            return False
+
+    # User-defined function to validate mobile number
+    @staticmethod
+    def phone_no_validation(phone):
+        if 6000000000 < phone < 10000000000:
+            result = User.check_existing_user(str(phone), 2)
+            if result:
+                print(
+                    "This phone number is already link with another account\n\t Try to enter another number...")
+                return True
+            else:
+                return False
+
+    # User-defined function to validate email-id
+    @staticmethod
+    def email_id_validation(email_id):
+        regex = "^[A-Za-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$"
+        rule = re.compile(regex)
+        if re.search(rule, email_id):
+            result = User.check_existing_user(email_id, 3)
+            if result:
+                print("This email id is already link with another account")
+                prompt = " 1.Try to enter another email id or 2.try log in with that email ?"
+                valid_choice = [1, 2]
+                user_choices = User.get_user_choice(prompt, valid_choice)
+                if user_choices == 2:
+                    User.sign_in()
+                else:
+                    return True
+            else:
+                return False
+        else:
+            return True
 
     # User-defined function to create a user
     @classmethod
     def sign_up(cls):
         global __customer_id, user_choice, __username, __password, __email_id, __phone
-        if global_cursor is None:
-            raise Exception("Cursor not initialized. Call create_cursor() first.")
-        print("_" * 100, "\n\t\t\t\t\t\t\t\t\t- > Sign-Up < -"), \
-            print("_" * 100, "\n")
+        print("_" * 100, "\n\t\t\t\t\t\t\t\t\t- > Sign-Up < -"),
+        print("_" * 100, "\n")
         flag = True
-        regex = "(?=.*[a-z])(?=.*[A-Z]).+$"
-        rule = re.compile(regex)
+        # regex = "(?=.*[a-z])(?=.*[A-Z]).+$"
+        # rule = re.compile(regex)
         while flag:
             __username = input("Enter the Username:\n")
-            if re.search(rule, __username):
-                result = User.check_existing_user(__username, 1)
-                if not result:
-                    flag = False
-                else:
-                    print("This username is already exist")
-                    prompt = " 1.Try to enter another username or 2.try log in with that username ?"
-                    valid_choice = [1, 2]
-                    user_choice = User.get_user_choice(prompt, valid_choice)
-                    if user_choice == 2:
-                        User.sign_in()
+            flag = User.username_validation(__username)
+            if flag:
+                print("Invalid Username!\nPlease try to enter a valid username!\n")
             else:
-                print("Invalid Username!\nPlease try to enter a valid username!")
+                flag = False
         flag = True
-        regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!#%*?&]{6,20}$"
-        rule = re.compile(regex)
+
         while flag:
             __password = input("Enter the password:\n")
-            if re.search(rule, __password):
+            flag = User.password_validation(__password)
+            if flag:
                 __password = User.generate_sha256_hash(__password)
                 flag = False
             else:
-                print("Invalid password!\nPlease try  to enter a valid password")
+                print("Invalid password!\nPlease try  to enter a valid password\n")
         flag = True
+
         while flag:
             try:
                 __phone = int(input("Enter your Mobile number:\n"))
-            except TypeError:
-                print("Invalid entry !\nPlease try  to enter a valid Mobile number")
+            except:
+                print("Invalid entry !\nPlease try to enter a valid Mobile number\n")
             else:
-                # query = "Select username from credentials where phoneno=%s;"
-                if 6000000000 < __phone < 10000000000:
-                    # global_cursor.execute(query, (__phone,))
-                    result = User.check_existing_user(str(__phone), 2)
-                    if not result:
-                        flag = False
-                    else:
-                        print(
-                            "This phone number is already link with another account\n\t Try to enter another number...")
+                flag = User.phone_no_validation(__phone)
+                if flag:
+                    print("Invalid Mobile number!\nPlease try  to enter a valid Mobile number\n")
                 else:
-                    print("Invalid Mobile number!\nPlease try  to enter a valid Mobile number")
+                    flag = False
         flag = True
-        regex = "^[A-Za-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$"
-        rule = re.compile(regex)
+
         while flag:
             __email_id = input("Enter the email:\n")
-            # query = "Select username from credentials where emailid=%s;"
-            if re.search(rule, __email_id):
-                # global_cursor.execute(query, (__email_id,))
-                result = User.check_existing_user(__email_id, 3)
-                if not result:
-                    flag = False
-                else:
-                    print("This email id is already link with another account")
-                    prompt = " 1.Try to enter another email id or 2.try log in with that email ?"
-                    valid_choice = [1, 2]
-                    user_choice = User.get_user_choice(prompt, valid_choice)
-                    if user_choice == 2:
-                        User.sign_in()
+            flag = User.email_id_validation(__email_id)
+            if flag:
+                flag = False
             else:
                 print("Invalid Email Id!\nPlease try  to enter a valid email")
 
+        # Uploading the user's details inside the database
         __customer_id = User.generate_customer_id(__username, str(__phone))
         date1 = User.get_timestamp(3)
         query = "insert into credentials values(%s,%s,%s,%s,%s,%s);"
