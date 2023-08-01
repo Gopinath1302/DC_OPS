@@ -1,0 +1,9 @@
+
+[python:S5754"<Specify an exception class to catch or reraise the exception(ˆÊÉ·8Íð“¹š1
+[python:S57543"<Specify an exception class to catch or reraise the exception(ˆÊÉ·8Íð“¹š1
+Xpython:S11438"9Remove this "return" statement from this "finally" block.(àÙ‹·8Íð“¹š1
+|python:S6537="]Consider replacing this octal escape sequence with a Unicode or hexadecimal sequence instead.(©·ªù8Íð“¹š1
+xpython:S3776j"TRefactor this function to reduce its Cognitive Complexity from 16 to the 15 allowed.(Àñöðùÿÿÿÿ8Îð“¹š1
+[python:S5754u"<Specify an exception class to catch or reraise the exception(ˆÊÉ·8Îð“¹š1
+\python:S5754"<Specify an exception class to catch or reraise the exception(ˆÊÉ·8Îð“¹š1
+Xpython:S5727³"3Remove this identity check; it will always be True.(ïŽµ”ûÿÿÿÿ8¾¿ž¹š1

@@ -2,7 +2,7 @@
 # Author             : Agateeswaran K
 # Created on         : 07/02/2023
 # Last Modified Date : 27/07/2023
-# Reviewed by        : Silpa M
+# Reviewed by        : Silpa Madhusoodanan
 # Reviewed on        : 20/02/2023
 
 
@@ -252,7 +252,7 @@ class Payment:
             elif user_choice == 3:
                 status = Payment.upi_payment(total)
             elif user_choice == 4:
-                status = False
+                status = True
             flag = not status
         return status
 
@@ -275,7 +275,7 @@ class Customer(Payment):
         if status:
             query = "update service set  p_status = %s where cus_id = %s"
             values = ('Successful', customer_id)
-            query_execute(1, query, values)
+            result = query_execute(1, query, values)
 
     # User-defined function to display the user's Service details
     @staticmethod

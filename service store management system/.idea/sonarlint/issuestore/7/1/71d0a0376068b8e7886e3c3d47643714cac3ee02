@@ -1,0 +1,18 @@
+
+‹python:S1192}"lDefine a constant instead of duplicating this literal ">Successfully updated the User Information<" 5 times.(ÛÂá­8Üü¸š1
+tpython:S4487"URemove this unread private attribute '__phone' or refactor the code to use its value.(Ñ·Ã¹8Üü¸š1
+}python:S4487"YRemove this unread private attribute '__last_name' or refactor the code to use its value.(£Æ„úÿÿÿÿ8Üü¸š1
+rpython:S4487"SRemove this unread private attribute '__DOB' or refactor the code to use its value.(¦Ñ»Ä8Üü¸š1
+wpython:S4487"XRemove this unread private attribute '__username' or refactor the code to use its value.(»ØèØ8Üü¸š1
+~python:S4487"ZRemove this unread private attribute '__first_name' or refactor the code to use its value.(úİ‚äúÿÿÿÿ8Üü¸š1
+|python:S4487"XRemove this unread private attribute '__password' or refactor the code to use its value.(‰òöúÿÿÿÿ8Üü¸š1
+{python:S4487"WRemove this unread private attribute '__address' or refactor the code to use its value.(­Äá¯şÿÿÿÿ8Üü¸š1
+python:S4487"[Remove this unread private attribute '__customer_id' or refactor the code to use its value.(ô¡æşÿÿÿÿ8Üü¸š1
+|python:S4487"XRemove this unread private attribute '__email_id' or refactor the code to use its value.(†×¥ûÿÿÿÿ8Üü¸š1
+Bpython:S125"Remove this commented out code.(ÿ¤”Äıÿÿÿÿ8Üü¸š1
+tpython:S3776Ä"TRefactor this function to reduce its Cognitive Complexity from 18 to the 15 allowed.(ıŒ¸8Üü¸š1
+]python:S112Æ">Replace this generic exception class with a more specific one.(÷ü8Üü¸š1
+\python:S5754Ş"<Specify an exception class to catch or reraise the exception(ˆÊÉ·8Üü¸š1
+Upython:S6397°"5Replace this character class by the character itself.(ü±¸Ÿ8Şü¸š1
+ypython:S3776Ä"TRefactor this function to reduce its Cognitive Complexity from 20 to the 15 allowed.(¯Î•¤úÿÿÿÿ8Şü¸š1
+\python:S5754ß"<Specify an exception class to catch or reraise the exception(ˆÊÉ·8Şü¸š1

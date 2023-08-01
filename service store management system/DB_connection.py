@@ -2,7 +2,7 @@
 # Author             : Agateeswaran K
 # Created on         : 07/02/2023
 # Last Modified Date : 27/07/2023
-# Reviewed by        : Silpa M
+# Reviewed by        : Silpa Madhusoodanan
 # Reviewed on        : 20/02/2023
 
 
@@ -17,9 +17,68 @@ connection = mysql.connector.connect(
 
 global_cursor = connection.cursor()
 
+# Select * from credentials;
+# Select * from userdata;
+# select * from address;
+# select * from service;
+
+
+# User defined function to check and create the necessary tables in DB if needed
+def check_db():
+    # Check for table credential
+    query = "SHOW TABLES LIKE 'credentials';"
+    result = query_execute(3, query, values=None)
+    if not result:
+        query = ('create table credentials (cus_id varchar(10), username varchar(20), password varchar(64), '
+                 'phoneno varchar(10), emailid varchar(50), joindate date);')
+        query_execute(5, query, values=None)
+
+    # Check for  table userdata
+    query = "SHOW TABLES LIKE 'userdata';"
+    result = query_execute(3, query, values=None)
+    if not result:
+        query = ('create table userdata ( cus_id varchar(10), username varchar(30), fname varchar(20), lname varchar('
+                 '20), dob date, emailid varchar(40), phone varchar(10), zip_code varchar(10), timestamp varchar(20));')
+        query_execute(5, query, values=None)
+
+    # Check for table address
+    query = "SHOW TABLES LIKE 'address';"
+    result = query_execute(3, query, values=None)
+    if not result:
+        query = ('create table address( cus_id varchar(10), door_no varchar(5), street varchar(50), city varchar(30), '
+                 'state varchar(20), country varchar(30), zip_code varchar(10), timestamp varchar(20));')
+        query_execute(5, query, values=None)
+
+    # Check for table service
+    query = "SHOW TABLES LIKE 'service';"
+    result = query_execute(3, query, values=None)
+    if not result:
+        query = ('create table service ( cus_id varchar(10), service_id varchar(10), service_name varchar(20), '
+                 'price int, sdate date, timestamp varchar(20), p_status varchar(10));')
+        query_execute(5, query, values=None)
+
+    # Check for table bank
+    query = "SHOW TABLES LIKE 'bank';"
+    result = query_execute(3, query, values=None)
+    if result is None:
+        query = 'create table bank (s_no integer, bname varchar(30));'
+        query_execute(5, query, values=None)
+        data = [
+            (1, 'State Bank Of India'), (2, 'Punjab National Bank'), (3, 'Indian Bank'),
+            (4, 'Bank Of India'), (5, 'UCO Bank'), (6, 'Union Bank Of India'),
+            (7, 'Central Bank Of India'), (8, 'Bank Of Baroda'), (9, 'Bank Of Maharashtra'),
+            (10, 'Canara Bank'), (11, 'Punjab And Sind Bank'), (12, 'Indian Overseas Bank'),
+            (13, 'ICICI Bank'), (14, 'HDFC Bank'), (15, 'Axis Bank'),
+            (16, 'IDBI Bank'), (17, 'Dhanlaxmi Bank'), (18, 'Kotak Mahindra Bank'),
+            (19, 'Federal Bank')
+        ]
+        query = "insert into bank values (%s,%s);"
+        global_cursor.executemany(query, data)
+
 
 # User-defined function to perform various query operations
 def query_execute(case, query, values):
+    result = None
     global_cursor.execute(query, values)
     # Case 1 and case 2  for insert and for update respectively
     if case == 1 or case == 2:
@@ -27,8 +86,16 @@ def query_execute(case, query, values):
     # Case 3 for select which return single row from DB
     elif case == 3:
         result = global_cursor.fetchone()
-        return result
-    # Case 4 for select which returns multiple rows from DB
+        # Case 4 for select which returns multiple rows from DB
     elif case == 4:
         result = global_cursor.fetchall()
-        return result
+    elif case == 5:
+        result = global_cursor.fetchone()
+    return result
+
+
+
+
+def close_db_connection():
+    global_cursor.close()
+    connection.close()

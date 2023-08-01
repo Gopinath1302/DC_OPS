@@ -2,7 +2,7 @@
 # Author             : Agateeswaran K
 # Created on         : 07/02/2023
 # Last Modified Date : 27/07/2023
-# Reviewed by        : Silpa M
+# Reviewed by        : Silpa Madhusoodanan
 # Reviewed on        : 20/02/2023
 
 import re
@@ -14,7 +14,7 @@ from datetime import date, datetime
 class Service:
     __service_price = 1000
     __service = "Nominal service Charges"
-
+    # count =
     # User-defined function to check where a user is eligible to get a service or not
     @staticmethod
     def check_service_eligiblity(customer_id):
@@ -23,6 +23,23 @@ class Service:
         result = query_execute(3,query,(customer_id,))
         try:
             if result[0] >10500:
+                status = True
+        except TypeError:
+            status = True
+        else:
+            if result[0] > 10000:
+                status = False
+            else:
+                status = True
+        return status
+
+    @staticmethod
+    def check_service_eligiblity(customer_id):
+        status = True
+        query = "Select sum(price) from service where cus_id = %s and p_status = 'Pending';"
+        result = query_execute(3, query, (customer_id,))
+        try:
+            if result[0] > 10500:
                 status = True
         except TypeError:
             status = True
