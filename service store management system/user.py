@@ -1,7 +1,7 @@
 # Title              : Service Management system
 # Author             : Agateeswaran K
 # Created on         : 07/02/2023
-# Last Modified Date : 27/07/2023
+# Last Modified Date : 07/08/2023
 # Reviewed by        : Silpa Madhusoodanan
 # Reviewed on        : 20/02/2023
 
@@ -10,6 +10,8 @@ import re
 from DB_connection import global_cursor, query_execute
 from datetime import date, datetime
 import hashlib
+
+
 # from pwinput import pwinput
 
 
@@ -25,18 +27,28 @@ class User:
     __DOB = ""
     user_choice: int = 0
 
-    # Function to
+    # User-defined function to reset the password
+    # under-development
+    @staticmethod
+    def reset_password():
+        pass
+
+    # User-defined function to get timestamp
     @staticmethod
     def get_timestamp(case=0):
-        # Get the current timestamp
-        timestamp = datetime.timestamp(datetime.now())
-        # gets current date
+        # gets the current timestamp
+        value = datetime.now()
+        timestamp = datetime.timestamp(value)
+        # gets the current month
+        current_month = value.month
+        # gets the current year
+        current_year = value.year
+        # gets the current date
         value = date.today()
         # Format the datetime object as a string
         dt = datetime.fromtimestamp(timestamp)
         # Format the datetime object as a string
         formatted_datetime = dt.strftime("%Y-%m-%d %H:%M:%S")
-        #
         current_time = datetime.now().time()
         time_string = current_time.strftime("%I:%M:%S %p")
         # function call for timestamp
@@ -51,8 +63,14 @@ class User:
         # function call for time with local format
         elif case == 4:
             return time_string
+        # function call for time with current month
+        elif case == 5:
+            return current_month
+        # function call for time with current year
+        elif case == 6:
+            return current_year
 
-    # Function to convert password into a hash value
+    # User-defined function to convert password into a hash value
     @staticmethod
     def generate_sha256_hash(value):
         sha256_hash = hashlib.sha256(value.encode()).hexdigest()
@@ -73,26 +91,31 @@ class User:
 
     # User-defined function to generate Customer_id
     @staticmethod
-    def generate_customer_id(username="", phone=""):
+    def generate_user_id(case, username="", phone=""):
+        user_id = ''
         username = re.sub(r"\s+", " ", username)
         username = username.upper()
-        cus_id = "CUS" + username[:2] + phone[:5]
-        return cus_id
+        if case == 1:
+            user_id = "CUS" + username[:2] + phone[:5]
+        elif case == 2:
+            user_id = "EMP" + username[:2] + phone[:5]
+        return user_id
 
     # User-defined function to print User details
     @classmethod
-    def print_user_details(cls, __customer_id=""):
-        print("_" * 100, "\n\t\t\t\t\t\t\t\t\t- > Details < -")
-        print("_" * 100, "\n")
+    def print_user_details(cls, __user_id=""):
+        text = "- > Details < -"
+        print("_" * 105, "\n", text.center(105))
+        print("_" * 105, "\n")
         query = "Select * from userdata where cus_id = %s;"
-        values = (__customer_id,)
+        values = (__user_id,)
         result = query_execute(3, query, values)
         print("Customer ID:", result[0], "\t\t\t", "Username:", result[1])
         print("First Name:", result[2], "\t\t\t", "Last Name:", result[3])
         print("Date of Birth:", result[4], "\t\t  ", "Email ID:", result[5])
         print("Mobile Number:", result[6])
         query = "Select * from address where cus_id = %s;"
-        values = (__customer_id,)
+        values = (__user_id,)
         result = query_execute(3, query, values)
         value = result[1:7]
         for i in range(len(value)):
@@ -106,10 +129,11 @@ class User:
 
     # User-defined function to update User details
     @classmethod
-    def update_user_details(cls, __customer_id=""):
+    def update_user_details(cls, __user_id=""):
         global __username, __email_id, __phone, __first_name, __last_name, __DOB, user_choice, __address
-        print("_" * 100, "\n\t\t\t\t\t\t\t\t\t- > Updation < -")
-        print("_" * 100, "\n")
+        text = "- > Updation < -"
+        print("_" * 105, "\n", text.center(105))
+        print("_" * 105, "\n")
         prompt = "Which details do you need to update \n1.First name,\n2.Last name,\n3.Date of Birth," \
                  "\n4.Address\n5.Update all details\n6.Back to dashboard\n"
         valid_choices = [1, 2, 3, 4, 5, 6]
@@ -120,7 +144,7 @@ class User:
                 __first_name = input()
                 query = "update userdata set fname=%s, timestamp=%s where cus_id=%s;"
                 timestamp = User.get_timestamp(2)
-                values = (__first_name, timestamp, __customer_id)
+                values = (__first_name, timestamp, __user_id)
                 query_execute(2, query, values)
                 print("\n", "-" * 25, ">Successfully updated the User Information<", "-" * 25, "\n")
             elif user_choice == 2:
@@ -128,7 +152,7 @@ class User:
                 __last_name = input()
                 query = "update userdata set lname=%s, timestamp=%s where cus_id=%s;"
                 timestamp = User.get_timestamp(2)
-                values = (__last_name, timestamp, __customer_id)
+                values = (__last_name, timestamp, __user_id)
                 query_execute(2, query, values)
                 print("\n", "-" * 25, ">Successfully updated the User Information<", "-" * 25, "\n")
             elif user_choice == 3:
@@ -136,7 +160,7 @@ class User:
                 __DOB = input()
                 query = "update userdata set dob=%s, timestamp =%s where cus_id=%s;"
                 timestamp = User.get_timestamp(2)
-                values = (__DOB, timestamp, __customer_id)
+                values = (__DOB, timestamp, __user_id)
                 query_execute(2, query, values)
                 print("\n", "-" * 25, ">Successfully updated the User Information<", "-" * 25, "\n")
             elif user_choice == 4:
@@ -155,7 +179,7 @@ class User:
                 country = input()
                 query = "update address set door_no=%s, street=%s, city=%s, state=%s, country=%s, zip_code=%s, timestamp =%s where cus_id =%s;"
                 timestamp = User.get_timestamp(2)
-                values = (door_no, street, city, state, country, zip_code, timestamp, __customer_id)
+                values = (door_no, street, city, state, country, zip_code, timestamp, __user_id)
                 query_execute(2, query, values)
                 print("\n", "-" * 25, ">Successfully updated the User Information<", "-" * 25, "\n")
             elif user_choice == 5:
@@ -167,7 +191,7 @@ class User:
                 __DOB = input()
                 query = "update userdata set fname=%s, lname=%s, dob=%s, timestamp=%s where cus_id=%s;"
                 timestamp = User.get_timestamp(2)
-                values = (__first_name, __last_name, __DOB, timestamp, __customer_id)
+                values = (__first_name, __last_name, __DOB, timestamp, __user_id)
                 query_execute(2, query, values)
                 print("Enter the Your address:")
                 print("Door no:")
@@ -185,7 +209,7 @@ class User:
                 # cus_id, door_no, street, city, state, country, zip_code, timestamp
                 query = "update address set door_no=%s, street=%s, city=%s, state=%s, country=%s, zip_code=%s, timestamp =%s where cus_id =%s;"
                 timestamp = User.get_timestamp(2)
-                values = (door_no, street, city, state, country, zip_code, timestamp, __customer_id)
+                values = (door_no, street, city, state, country, zip_code, timestamp, __user_id)
                 query_execute(2, query, values)
                 print("\n", "-" * 25, ">Successfully updated the User Information<", "-" * 25, "\n")
             elif user_choice == 6:
@@ -197,7 +221,8 @@ class User:
         if global_cursor is None:
             raise Exception("Cursor not initialized. Call create_cursor() first.")
         global user_choice, __username, __password, __email_id, __phone, __customer_id
-        print("_" * 105, "\n\t\t\t\t\t\t\t\t\t- > Sign-in < -")
+        text = "- > Sign-in < -"
+        print("_" * 105, "\n", text.center(105))
         print("_" * 105, "\n")
         flag = True
         prompt = ("\n\t\t\t\t\tError!, invalid credentials\nWant retry to signing-in ? or "
@@ -218,7 +243,6 @@ class User:
                 __customer_id = result[0]
                 credentials = result[2]
                 # print(2)
-
             except:
                 # print(3)
                 user_choice = User.get_user_choice(prompt, valid_choice)
@@ -229,7 +253,8 @@ class User:
                     quit()
             else:
                 if credentials == hash_value:
-                    print("\n\t\t\t\t\tlogged-in successfully!\n")
+                    text = "logged-in successfully!"
+                    print(text.center(105))
                     return __customer_id
                 else:
                     user_choice = User.get_user_choice(prompt, valid_choice)
@@ -267,10 +292,10 @@ class User:
                 prompt = " 1.Try to enter another username or 2.try log in with that username ?\n"
                 valid_choice = [1, 2]
                 user_choices = User.get_user_choice(prompt, valid_choice)
-                if user_choices == 2:
-                    User.sign_in()
-                else:
+                if user_choices == 1:
                     return True
+                else:
+                    return None
             else:
                 return False
         else:
@@ -304,16 +329,15 @@ class User:
         regex = "^[A-Za-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$"
         rule = re.compile(regex)
         if re.search(rule, email_id):
-            result = User.check_existing_user(email_id, 3)
-            if result:
+            if User.check_existing_user(email_id, 3):
                 print("This email id is already link with another account")
                 prompt = " 1.Try to enter another email id or 2.try log in with that email ?"
                 valid_choice = [1, 2]
                 user_choices = User.get_user_choice(prompt, valid_choice)
-                if user_choices == 2:
-                    User.sign_in()
-                else:
+                if user_choices == 1:
                     return True
+                else:
+                    return None
             else:
                 return False
         else:
@@ -321,14 +345,37 @@ class User:
 
     # User-defined function to create a user
     @classmethod
-    def sign_up(cls):
-        global __customer_id, user_choice, __username, __password, __email_id, __phone
-        print("_" * 105, "\n\t\t\t\t\t\t\t\t\t- > Sign-Up < -"),
+    def create_user(cls):
+        pass
+
+
+class Customer(User):
+    __employee_id: str = ""
+    __username: str = ""
+    __password: str = ""
+    __phone: int = 0
+    __email_id: str = ""
+    __address: str = ""
+    __first_name: str = ""
+    __last_name: str = ""
+    __DOB = ""
+    user_choice: int = 0
+
+    # overidden function to create a customer
+    @classmethod
+    def create_user(cls):
+
+        username = ""
+        password = ""
+        phone = 1
+        email_id = ""
+        text = "- > Sign-up < -"
+        print("_" * 105, "\n", text.center(105))
         print("_" * 105, "\n")
         flag = True
         while flag:
-            __username = input("Enter the Username:\n")
-            flag = User.username_validation(__username)
+            username = input("Enter the Username:\n")
+            flag = User.username_validation(username)
             if flag:
                 print("Invalid Username!\nPlease try to enter a valid username!\n")
             else:
@@ -336,10 +383,10 @@ class User:
         flag = True
 
         while flag:
-            __password = input("Enter the password:\n")
-            flag = User.password_validation(__password)
+            password = input("Enter the password:\n")
+            flag = User.password_validation(password)
             if flag:
-                __password = User.generate_sha256_hash(__password)
+                password = User.generate_sha256_hash(password)
                 flag = False
             else:
                 print("Invalid password!\nPlease try  to enter a valid password\n")
@@ -347,37 +394,182 @@ class User:
 
         while flag:
             try:
-                __phone = int(input("Enter your Mobile number:\n"))
+                phone = int(input("Enter your Mobile number:\n"))
             except:
                 print("Invalid entry !\nPlease try to enter a valid Mobile number\n")
             else:
-                flag = User.phone_no_validation(__phone)
+                flag = User.phone_no_validation(phone)
                 if flag:
                     print("Invalid Mobile number!\nPlease try  to enter a valid Mobile number\n")
                 else:
                     flag = False
         flag = True
 
+        flag = True
         while flag:
-            __email_id = input("Enter the email:\n")
-            flag = User.email_id_validation(__email_id)
-            if flag:
-                flag = False
+            email_id = input("Enter the email:\n")
+            if User.email_id_validation(email_id):
+                print("Invalid Email Id!\nPlease try to enter a valid email")
+                flag = True
             else:
-                print("Invalid Email Id!\nPlease try  to enter a valid email")
+                flag = False
 
         # Uploading the user's details inside the database
-        __customer_id = User.generate_customer_id(__username, str(__phone))
+        customer_id = User.generate_user_id(1, username, str(phone))
         date1 = User.get_timestamp(3)
         query = "insert into credentials values(%s,%s,%s,%s,%s,%s);"
-        values = (__customer_id, __username, __password, str(__phone), __email_id, date1)
+        values = (customer_id, username, password, str(phone), email_id, date1)
         query_execute(1, query, values)
         timestamp = User.get_timestamp(2)
         query = "insert into userdata values(%s,%s,%s,%s,%s,%s,%s,%s,%s);"
-        values = (__customer_id, __username, None, None, None, __email_id, str(__phone), None, timestamp)
+        values = (customer_id, username, None, None, None, email_id, str(phone), None, timestamp)
         query_execute(1, query, values)
         query = "insert into address values(%s,%s,%s,%s,%s,%s,%s,%s);"
-        values = (__customer_id, None, None, None, None, None, None, timestamp)
+        values = (customer_id, None, None, None, None, None, None, timestamp)
         query_execute(1, query, values)
         print("\n", "-" * 25, ">Successfully registered as the User<", "-" * 25)
-        return __customer_id
+
+
+class Admin(User):
+    @staticmethod
+    # User-defined function to auto generate password
+    def auto_generate_password(name, dob):
+        year, month, day = map(int, dob.split('-'))
+        password = name + "@" + str(year)
+        return password
+
+    # User-defined function to validate date of birth
+    @staticmethod
+    def validate_dob(dob):
+        dob_pattern = r'^\d{4}-\d{2}-\d{2}$'
+        current_year = Admin.get_timestamp(1)
+        if re.match(dob_pattern, dob):
+            year, month, day = map(int, dob.split('-'))
+            if year >= current_year - 21 and 0 < month < 13:
+                return True
+        return False
+
+    # overidden function to create a employee
+    @classmethod
+    def create_user(cls):
+
+        username = ""
+        password = ""
+        phone = 1
+        email_id = ""
+        DOB = ''
+        text = "- > Employee creator < -"
+        print("_" * 105, "\n", text.center(105))
+        print("_" * 105, "\n")
+        flag = True
+        while flag:
+            username: str = input("Enter the Username:\n")
+            flag = Admin.username_validation(username)
+            if flag:
+                print("Invalid Username!\nPlease try to enter a valid username!\n")
+            else:
+                flag = False
+
+        flag = True
+
+        while flag:
+            DOB = input("Enter the the year from the employee's date of birth(YYYY-mm-dd):\n")
+            flag = Admin.validate_dob(DOB)
+            if flag:
+                print("Invalid DOB!\nPlease try to enter a valid DOB!\n")
+            else:
+                flag = False
+
+        flag = True
+
+        while flag:
+            try:
+                phone = int(input("Enter the Mobile number:\n"))
+            except:
+                print("Invalid entry !\nPlease try to enter a valid Mobile number\n")
+            else:
+                flag = Admin.phone_no_validation(phone)
+                if flag:
+                    print("Invalid Mobile number!\nPlease try  to enter a valid Mobile number\n")
+                else:
+                    flag = False
+
+        flag = True
+
+        flag = True
+        while flag:
+            email_id = input("Enter the email:\n")
+            if User.email_id_validation(email_id):
+                print("Invalid Email Id!\nPlease try to enter a valid email")
+                flag = True
+            else:
+                flag = False
+
+        # Uploading the user's details inside the database
+        if flag is None:
+            text = "\n" + "-" * 34 + "-> Failed create an employee <-" + "-" * 34
+            print(text.center(105))
+        else:
+            __employee_id = Admin.generate_user_id(2, username, str(phone))
+            date1 = Admin.get_timestamp(3)
+            __password = Admin.auto_generate_password(username, DOB)
+            query = "insert into credentials values(%s, %s, %s, %s, %s, %s);"
+            values = (__employee_id, username, __password, str(phone), email_id, date1)
+            query_execute(1, query, values)
+            timestamp = Admin.get_timestamp(2)
+            query = "insert into userdata values(%s, %s, %s, %s, %s, %s, %s, %s, %s);"
+            values = (__employee_id, username, None, None, None, email_id, str(phone), None, timestamp)
+            query_execute(1, query, values)
+            query = "insert into address values(%s, %s, %s, %s, %s, %s, %s, %s);"
+            values = (__employee_id, None, None, None, None, None, None, timestamp)
+            query_execute(1, query, values)
+            text = "\n" + "-" * 34 + "-> Successfully created an employee <-" + "-" * 34
+            print(text.center(105))
+
+    # overidden function to view employee's list
+    @staticmethod
+    def view_employees():
+        text = "- > Employees list < -"
+        print("_" * 105, "\n", text.center(105))
+        print("_" * 105, "\n")
+        query = "select cus_id, username from userdata where cus_id like 'EMP%';"
+        result = query_execute(4, query, values=None)
+        if not result:
+            text = 'There are no employees currently'
+            print(text.center(105))
+        else:
+            print("Employee_id\t\t\t Username")
+            for row in result:
+                list1 = row
+                print(list1[0], "\t\t\t", list1[1])
+
+    # overidden function to remove an employee
+    @staticmethod
+    def remove_employee():
+        text = "- > Delete employee < -"
+        print("_" * 105, "\n", text.center(105))
+        print("_" * 105, "\n")
+        print("Enter the employee_id:\n")
+        __employee_id = input()
+        values = (__employee_id,)
+
+        query = "delete from address where cus_id = %s;"
+        query_execute(2, query, values)
+        query = "select cus_id from address where cus_id = %s;"
+        result = query_execute(3, query, values)
+        if result is None:
+            query = "delete from userdata where cus_id = %s;"
+            query_execute(2, query, values)
+            query = "select cus_id from userdata where cus_id = %s;"
+            result = query_execute(3, query, values)
+        if result is None:
+            query = "delete from credentials where cus_id = %s;"
+            query_execute(2, query, values)
+            query = "select cus_id from credentials where cus_id = %s;"
+            result = query_execute(3, query, values)
+        if result is None:
+            text = "-> Successfully removed the employee <-"
+            print(text.center(105))
+        else:
+            text = "-> Failed to remove the employee <-"
+

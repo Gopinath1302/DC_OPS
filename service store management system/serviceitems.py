@@ -1,7 +1,7 @@
 # Title              : Service Management system
 # Author             : Agateeswaran K
 # Created on         : 07/02/2023
-# Last Modified Date : 27/07/2023
+# Last Modified Date : 07/08/2023
 # Reviewed by        : Silpa Madhusoodanan
 # Reviewed on        : 20/02/2023
 
@@ -14,7 +14,7 @@ from datetime import date, datetime
 class Service:
     __service_price = 1000
     __service = "Nominal service Charges"
-    # count =
+
     # User-defined function to check where a user is eligible to get a service or not
     @staticmethod
     def check_service_eligiblity(customer_id):
@@ -23,23 +23,6 @@ class Service:
         result = query_execute(3,query,(customer_id,))
         try:
             if result[0] >10500:
-                status = True
-        except TypeError:
-            status = True
-        else:
-            if result[0] > 10000:
-                status = False
-            else:
-                status = True
-        return status
-
-    @staticmethod
-    def check_service_eligiblity(customer_id):
-        status = True
-        query = "Select sum(price) from service where cus_id = %s and p_status = 'Pending';"
-        result = query_execute(3, query, (customer_id,))
-        try:
-            if result[0] > 10500:
                 status = True
         except TypeError:
             status = True
@@ -73,16 +56,17 @@ class Service:
 
     # User-defined function to rise a service request
     @staticmethod
-    def rise_service_request(__customer_id,name):
+    def rise_service_request(__customer_id, name):
         status = Service.check_service_eligiblity(__customer_id)
         if not status:
-            print("We are apologizing to say this, ",name,"\nYou already having too many pending bills \nEnsure you pay the pending bills")
+            print("We are apologizing to say this, ", name, "\nYou already having too many pending bills \nEnsure you pay the pending bills")
             return 0
-        print("_" * 100, "\n\t\t\t\t\t\t\t\t\t- > Service initiation < -")
-        print("_" * 100, "\n")
+        text = "-> Service initiation <-"
+        print("_" * 105, "\n", text.center(105))
+        print("_" * 105, "\n")
         timestamp = Service.get_timestamp(2)
         date = Service.get_timestamp(3)
-        service_id = Service.generate_service_id(__customer_id,name)
+        service_id = Service.generate_service_id(__customer_id, name)
         query = "insert into service values ( %s, %s, 'Nominal Service', 1000, %s, %s, 'Pending');"
         values = (__customer_id, service_id, date, timestamp)
         query_execute(1, query, values)
@@ -146,71 +130,156 @@ class Service:
             return current_year
 
     # Under development
+    # User-defined function to get a validated model name
+    @staticmethod
+    def get_model_name():
+        flag = True
+        Model_name = ""
+        while flag:
+            model_name = input("Enter the Model name\n")
+            if 0 < len(model_name) < 40:
+                if Service.validate_name(2, model_name):
+                    flag = False
+                else:
+                    flag = True
+            else:
+                flag = True
+        return model_name
+
+    # User-defined function to  validated model name
+    @staticmethod
+    def validate_name(case, name):
+        pattern1 = r"^[A-Za-z\- ]+$"
+        pattern2 = r"^[A-Za-z0-9\- ]+$"
+        if case == 1:
+            rule = re.compile(pattern)
+        else:
+            rule = re.compile(pattern2)
+        return re.match(rule, name)
+        if result is not None:
+            return True
+        else:
+            return False
+
+    # User-defined function to get a validated device name
+    @staticmethod
+    def get_device_name():
+        flag = True
+        device_name = ""
+        prompt = "Please select the device category to which the device for servicing belongs\n\t\t1.Laptop\t\t\t\t\t\t2.Phone\n\t\t3.Earphones or Headphones\t\t4.Television\n\t\t5.Gaming consoles\t\t\t\t6.Personal Computers(Desktop pc)\n\t\t7.Smart watches\t\t\t\t\t8.Other\nSelect the device category\n"
+        valid_choice = [1, 2, 3, 4, 5, 6, 7, 8]
+        while flag:
+            userchoices = User.get_user_choice(prompt, valid_choice)
+            if userchoices == 1:
+                device_name = 'Laptop'
+                flag = False
+            elif userchoices == 2:
+                device_name = 'Phone'
+                flag = False
+            elif userchoices == 3:
+                device_name = 'Earphones'
+                flag = False
+            elif userchoices == 4:
+                device_name = 'Television'
+                flag = False
+            elif userchoices == 5:
+                device_name = 'Console'
+                flag = False
+            elif userchoices == 6:
+                device_name = 'Computers'
+                flag = False
+            elif userchoices == 7:
+                device_name = 'Smart watch'
+                flag = False
+            elif userchoices == 8:
+                device_name = input("Enter the device name\n")
+                print(len(device_name))
+                if 0 < len(device_name) < 50:
+                    print(1)
+                    if Service.validate_name(1, device_name):
+                        flag = False
+                    else:
+                        flag = True
+                else:
+                    flag = True
+        return device_name
+
+    # User-defined function to get a validated defect details
+    @staticmethod
+    def get_defect_details():
+        flag = True
+        while flag:
+            defect_description = input("Explain the faults that encountered while using this device:\n")
+            if len(defect_description) >= 10 and len(defect_description) <= 100:
+                flag = False
+            else:
+                print("Defect description should be between 10 and 200 characters.")
+
+        return defect_description
+
+
+    # User-defined function to get a device usage
+    @staticmethod
+    def get_device_usage():
+        flag = True
+        prompt = "How do you use the device ?\n\t1.Minimal\t2.Nominal\t3.Extensive\n"
+        valid_choices = [1, 2, 3]
+        while flag:
+            user_choice = User.get_user_choice(prompt, valid_choices)
+            if user_choice == 1:
+                usage = "Minimal"
+                flag = False
+            elif user_choice == 2:
+                usage = "Nominal"
+                flag = False
+            elif user_choice == 3:
+                usage = "Extensive"
+                flag = False
+            else:
+                flag = True
+        return usage
+
     # User-defined function to rise a detailed service request
     @staticmethod
     def rise_request(__customer_id=""):
         print("_" * 105, "\n\t\t\t\t\t\t\t\t\t- > Service initiation < -")
         print("_" * 105)
         time = Service.get_timestamp(2)
-        print("The device name:")
-        device_name = input()
-        print("Model name:")
-        model_name = input()
-        print("Explain the faults that encountered while using this device:")
-        defect_description = input()
-        usaage = ""
-        prompt = "How do you use the device ?\n\t1.Minimal\t2.Nominal\t3.Extensive\n"
-        valid_choices = [1, 2, 3]
-        user_choice = User.get_user_choice(prompt, valid_choices)
-        if user_choice == 1:
-            usaage = "Minimal"
-        elif user_choice == 2:
-            usaage = "Nominal"
-        elif user_choice == 3:
-            usaage = "Extensive"
-        query = "insert into service_request values(%s,%s,%s,%s,%s,%s,%s,%s);"
+        device_name = Service.get_device_name()
+        model_name = Service.get_model_name()
+        defect_description = Service.get_defect_details()
+        usaage = Service.get_device_usage()
+        status = 'Initiated'
+        date = Service.get_timestamp(3)
+        query = "insert into service_request values(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
+        query1 = "insert into services values(%s, %s, %s, %s, %s, %s, %s , %s, %s)"
         service_id = Service.generate_service_id(__customer_id, model_name)
         print("1.CustomerID:", __customer_id, "\n2.ServiceID:", service_id, "\n3.Device name:", device_name,
               "\n4.Model name:",
               model_name, "\n5.Defect:", defect_description, "\n6.Usage:", usaage, "\n7.Time:", time)
         prompt = "please ensure where all your request details are correct\n\t1.Yes\t2.No\n"
         valid_choice = [1, 2]
-        status = "Initiated"
         user_choice = User.get_user_choice(prompt, valid_choice)
-        if user_choice == 1:
-            values = (__customer_id, service_id, device_name, model_name, defect_description, usaage, status, time,'Pending')
-            query_execute(1, query, values)
-        else:
-            prompt = "Do you need to update the details\n\t1.yes\t2.No\n"
+        if user_choice == 2:
+            prompt = "Do you need to update the details\n\t1.Yes\t2.No\n"
             user_choice = User.get_user_choice(prompt, valid_choice)
-            if user_choice == 2:
-                values = (__customer_id, service_id, device_name, model_name, defect_description, usaage, status, time,'Pending')
-                query_execute(1, query, values)
-            elif user_choice == 1:
-                prompt = "Which details do you need to update?\n\t\t1.Customer ID\t\t2.Service ID\t\t3.Device name\n\t\t4.Model name\t\t5.Defect\t\t6.Usage"
-                valid_choice = [1, 2, 3, 4, 5, 6]
+            if user_choice == 1:
+                prompt = "Which details do you need to update?\n\t\t1.Device name\n\t\t2.Model name\n\t\t3.Defect\t\t4.Usage\n"
+                valid_choice = [1, 2, 3, 4]
                 user_choice = User.get_user_choice(prompt, valid_choice)
-                if user_choice == 1 or user_choice == 2 or user_choice == 6:
-                    print("Not possible!")
+                if user_choice == 1:
+                    device_name = Service.get_device_name()
+                elif user_choice == 2:
+                    model_name = Service.get_model_name()
                 elif user_choice == 3:
-                    print("Enter the Device name to be updated:\n")
-                    device_name = input()
+                    defect_description = Service.get_defect_details()
                 elif user_choice == 4:
-                    print("Enter the Model name to be updated:\n")
-                    model_name = input()
-                elif user_choice == 5:
-                    prompt = "How do you use the device ?\n\t1.Minimal\t2.Nominal\t3.Extensive\n"
-                    valid_choices = [1, 2, 3]
-                    user_choice = User.get_user_choice(prompt, valid_choices)
-                    if user_choice == 1:
-                        usaage = "Minimal"
-                    elif user_choice == 2:
-                        usaage = "Nominal"
-                    elif user_choice == 3:
-                        usaage = "Extensive"
-
-                values = (__customer_id, service_id, device_name, model_name, defect_description, usaage, status, time,'Pending')
-                query_execute(1, query, values)
+                   usaage =Service.get_device_usage()
+        data = (service_id, __customer_id, device_name, None, date, status, 0, 'Waiting', time)
+        values = (
+            __customer_id, service_id, device_name, model_name, defect_description, usaage, status, time, 0, 'Pending')
+        query_execute(1, query, values)
+        query_execute(1, query1, data)
         print("The service request has been raised. Technicians will get to the linked address and collect the "
               "device with-in 1 or 2 working days\n so please verify the address\n")
         query = "Select * from address where cus_id = %s;"
@@ -222,10 +291,66 @@ class Service:
                 print("Address:", value[i])
             else:
                 print("\t\t", value[i])
-        prompt = "\nAre you available in this address with the device\n\t1.Yes\t\t2.No\n"
+        prompt = "\nAre you available in this address with the defective device\n\t1.Yes\t\t2.No\n"
         valid_choices = [1, 2]
         user_choice = User.get_user_choice(prompt, valid_choices)
-        if user_choice == 1:
-            exit()
-        else:
+        if user_choice == 2:
             print("Please update the address as soon as possible in the yours details")
+            User.update_user_details()
+
+    # User-defined function to view all the pending service requests
+    @staticmethod
+    def view_all_service_request():
+        query = "select service_id, cus_id, device_name, price, s_status, sdate from services where s_status = 'Initiated';"
+        result = query_execute(4, query, values= None)
+        if not result:
+            text = 'There are no new services currently'
+            print(text.center(105))
+        else:
+            print("Service_id \t\t Customer_id \t\t Device_name \t  Price \t Service_status   Service_date")
+            for row in result:
+                list1 = row
+                print(list1[0], " \t\t ", list1[1], " \t\t ", list1[2],  " \t\t ", list1[3],  " \t ", list1[4], " \t  ", list1[5], )
+
+    # User-defined function to view a detailed service request
+    @staticmethod
+    def view_service_request():
+        query = "select ser_id, cus_id, device, model, defect, usaage, rstatus, time, price, p_status from service_request where  ser_id = %s ;"
+        print("Enter the Service_id to fetch the details\n")
+        service_id = input()
+        values =(service_id,)
+        result = query_execute(4,query,values)
+        if not result:
+            text = "There is no such new services with the entered Service_id: " + service_id
+            print(text.center(105))
+        else:
+            # print("Service_id  Customer_id  Device_name \t  Price \t Service_status   Service_date")
+            for row in result:
+                list1 = row
+                print("Service_Id\t\t\t:",list1[0], "\nCustomer_Id\t\t\t:", list1[1], "\nDevice_category \t:", list1[2],  " \nModel_Name\t\t\t:", list1[3],  "\nDefect_description  :", list1[4], " \nUsage\t\t\t\t:", list1[5],  "\nService_status\t\t:", list1[6], " \nTime\t\t\t\t:", list1[7],  "\nPrice\t\t\t\t: ", list1[8], " \nPayment_status\t\t:", list1[9])
+
+    # User-defined function to assign an employee to service request
+    @staticmethod
+    def assign_to_service(service_id,name):
+        query = "select serviced_by, timestamp from services where service_id = %s;"
+        values = (service_id,)
+        result = query_execute(3, query, values)
+        # print(result)
+        if result is None:
+            text = "There is no such new services with the entered Service_id: " + service_id
+            print(text.center(105))
+        elif result[0] is None:
+            # print("assign")
+            values = (name, service_id,result[1])
+            # print(values)
+            query = "update services set serviced_by = %s where service_id = %s and timestamp = %s "
+            query_execute(2, query, values)
+        else:
+            text = "The services with the entered Service_id: " + service_id + ", has been already alloted"
+            print(text.center(105))
+
+    # User-defined function for emplyee to self-assign to service request
+    @staticmethod
+    def self_assign():
+        print("enter the to self assign")
+        pass

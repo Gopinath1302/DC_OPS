@@ -1,7 +1,7 @@
 # Title              : Service Management system
 # Author             : Agateeswaran K
 # Created on         : 07/02/2023
-# Last Modified Date : 27/07/2023
+# Last Modified Date : 07/08/2023
 # Reviewed by        : Silpa Madhusoodanan
 # Reviewed on        : 20/02/2023
 
@@ -17,11 +17,6 @@ connection = mysql.connector.connect(
 
 global_cursor = connection.cursor()
 
-# Select * from credentials;
-# Select * from userdata;
-# select * from address;
-# select * from service;
-
 
 # User defined function to check and create the necessary tables in DB if needed
 def check_db():
@@ -32,6 +27,10 @@ def check_db():
         query = ('create table credentials (cus_id varchar(10), username varchar(20), password varchar(64), '
                  'phoneno varchar(10), emailid varchar(50), joindate date);')
         query_execute(5, query, values=None)
+        data = ('ADMAd44674', 'Admin', 'e86f78a8a3caf0b60d8e74e5942aa6d86dc150cd3c03338aef25b7d2d7e3acc7', '4467404000',
+                'admin-india@aspiresys.com', '2023-07-02')
+        query = "insert into credentials values (%s, %s, %s, %s, %s, %s);"
+        query_execute(1, query, data)
 
     # Check for  table userdata
     query = "SHOW TABLES LIKE 'userdata';"
@@ -40,6 +39,9 @@ def check_db():
         query = ('create table userdata ( cus_id varchar(10), username varchar(30), fname varchar(20), lname varchar('
                  '20), dob date, emailid varchar(40), phone varchar(10), zip_code varchar(10), timestamp varchar(20));')
         query_execute(5, query, values=None)
+        data = ('ADMAd44674', 'Admin', None, None, None, 'admin-india@aspiresys.com', '4467404000', None, '2023-07-02')
+        query = "insert into userdata values (%s, %s, %s, %s, %s, %s, %s, %s, %s);"
+        query_execute(1, query, data)
 
     # Check for table address
     query = "SHOW TABLES LIKE 'address';"
@@ -48,6 +50,9 @@ def check_db():
         query = ('create table address( cus_id varchar(10), door_no varchar(5), street varchar(50), city varchar(30), '
                  'state varchar(20), country varchar(30), zip_code varchar(10), timestamp varchar(20));')
         query_execute(5, query, values=None)
+        query = "insert into address values(%s, %s, %s, %s, %s, %s, %s, %s);"
+        data = ('ADMAd44674', None, None, None, None, None, None, '2023-07-02')
+        query_execute(1, query, data)
 
     # Check for table service
     query = "SHOW TABLES LIKE 'service';"
@@ -60,8 +65,8 @@ def check_db():
     # Check for table bank
     query = "SHOW TABLES LIKE 'bank';"
     result = query_execute(3, query, values=None)
-    if result is None:
-        query = 'create table bank (s_no integer, bname varchar(30));'
+    if not result:
+        query = 'create table bank (s_no integer, bank_name varchar(30));'
         query_execute(5, query, values=None)
         data = [
             (1, 'State Bank Of India'), (2, 'Punjab National Bank'), (3, 'Indian Bank'),
@@ -74,7 +79,7 @@ def check_db():
         ]
         query = "insert into bank values (%s,%s);"
         global_cursor.executemany(query, data)
-
+        connection.commit()
 
 # User-defined function to perform various query operations
 def query_execute(case, query, values):
@@ -86,16 +91,14 @@ def query_execute(case, query, values):
     # Case 3 for select which return single row from DB
     elif case == 3:
         result = global_cursor.fetchone()
-        # Case 4 for select which returns multiple rows from DB
+    # Case 4 for select which returns multiple rows from DB
     elif case == 4:
         result = global_cursor.fetchall()
     elif case == 5:
         result = global_cursor.fetchone()
     return result
 
-
-
-
+# User-defined function to close the cursor and the connections
 def close_db_connection():
     global_cursor.close()
     connection.close()

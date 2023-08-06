@@ -1,14 +1,13 @@
 # Title              : Service Management system
 # Author             : Agateeswaran K
 # Created on         : 07/02/2023
-# Last Modified Date : 27/07/2023
+# Last Modified Date : 07/08/2023
 # Reviewed by        : Silpa Madhusoodanan
 # Reviewed on        : 20/02/2023
 
 
 import time
 from serviceitems import Service
-from datetime import datetime
 from user import User
 import re
 from DB_connection import query_execute
@@ -166,7 +165,7 @@ class Payment:
         status = False
         print("\nEnter your Bank name")
         bank_name = input()
-        query = "select * from bank where bname = %s;"
+        query = "select * from bank where bank_name = %s;"
         values = (bank_name,)
         result = query_execute(3, query, values)
         if result is not None:
@@ -177,7 +176,6 @@ class Payment:
             print("Enter password for your internet banking: ")
             password = input()
             if username and password is not None:
-                # print("Enter your Transaction pin")
                 Payment.print_total(total)
                 pin = Payment.get_pin()
                 status = Payment.validate_pin(pin)
@@ -237,9 +235,10 @@ class Payment:
     # User-defined function to payment
     @staticmethod
     def payment_methods(total):
-        prompt = "_" * 100 + "\n" + "\t" * 9 + "- > Payment < -\n" + "_" * 100 + ("\n1. Net Banking\n2. Credit / Debit "
-                                                                                  "card\n3. UPI Payment\n4. Back to "
-                                                                                  "Dashboard\nEnter your choice:\n")
+        text = "-> Payments <-"
+        print("_" * 105, "\n", text.center(105))
+        print("_" * 105 )
+        prompt = ("\n1. Net Banking\n2. Credit / Debit card\n3. UPI Payment\n4. Back to Dashboard\nEnter your choice:\n")
         flag = True
         status = True
         valid_choice = [1, 2, 3, 4]
@@ -257,7 +256,7 @@ class Payment:
         return status
 
 
-class Customer(Payment):
+class Bill(Payment):
     total = 0
 
     # User-defined function to calculate the total price
@@ -280,12 +279,13 @@ class Customer(Payment):
     # User-defined function to display the user's Service details
     @staticmethod
     def print_details(name, __customer_id):
-        print("_" * 100, "\n\t\t\t\t\t\t\t\t\t", "> Services done <")
-        print("_" * 100)
+        text = "> Services done <"
+        print("_" * 105, "\n", text.center(105))
+        print("_" * 105)
         print("\nYour last Service details are as follows\n")
         print("Name: ", name, "\n")
         print("_" * 40, "\n")
-        total = Customer.calculate_total(__customer_id)
+        total = Bill.calculate_total(__customer_id)
         query = ("Select service_id, service_name, price, p_status from service where cus_id = %s and p_status = "
                  "'Pending';")
         values = (__customer_id,)
