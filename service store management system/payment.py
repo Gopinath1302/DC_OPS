@@ -279,7 +279,7 @@ class Bill(Payment):
     # User-defined function to display the user's Service details
     @staticmethod
     def print_details(name, __customer_id):
-        text = "> Services done <"
+        text = "-> Services done <-"
         print("_" * 105, "\n", text.center(105))
         print("_" * 105)
         print("\nYour last Service details are as follows\n")

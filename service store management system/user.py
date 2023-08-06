@@ -104,7 +104,7 @@ class User:
     # User-defined function to print User details
     @classmethod
     def print_user_details(cls, __user_id=""):
-        text = "- > Details < -"
+        text = "-> Details <-"
         print("_" * 105, "\n", text.center(105))
         print("_" * 105, "\n")
         query = "Select * from userdata where cus_id = %s;"
@@ -131,7 +131,7 @@ class User:
     @classmethod
     def update_user_details(cls, __user_id=""):
         global __username, __email_id, __phone, __first_name, __last_name, __DOB, user_choice, __address
-        text = "- > Updation < -"
+        text = "-> Updation <-"
         print("_" * 105, "\n", text.center(105))
         print("_" * 105, "\n")
         prompt = "Which details do you need to update \n1.First name,\n2.Last name,\n3.Date of Birth," \
@@ -221,7 +221,7 @@ class User:
         if global_cursor is None:
             raise Exception("Cursor not initialized. Call create_cursor() first.")
         global user_choice, __username, __password, __email_id, __phone, __customer_id
-        text = "- > Sign-in < -"
+        text = "-> Sign-in <-"
         print("_" * 105, "\n", text.center(105))
         print("_" * 105, "\n")
         flag = True
@@ -369,7 +369,7 @@ class Customer(User):
         password = ""
         phone = 1
         email_id = ""
-        text = "- > Sign-up < -"
+        text = "-> Sign-up <-"
         print("_" * 105, "\n", text.center(105))
         print("_" * 105, "\n")
         flag = True
@@ -458,7 +458,7 @@ class Admin(User):
         phone = 1
         email_id = ""
         DOB = ''
-        text = "- > Employee creator < -"
+        text = "-> Employee creator <-"
         print("_" * 105, "\n", text.center(105))
         print("_" * 105, "\n")
         flag = True
@@ -529,7 +529,7 @@ class Admin(User):
     # overidden function to view employee's list
     @staticmethod
     def view_employees():
-        text = "- > Employees list < -"
+        text = "-> Employees list <-"
         print("_" * 105, "\n", text.center(105))
         print("_" * 105, "\n")
         query = "select cus_id, username from userdata where cus_id like 'EMP%';"
@@ -546,7 +546,7 @@ class Admin(User):
     # overidden function to remove an employee
     @staticmethod
     def remove_employee():
-        text = "- > Delete employee < -"
+        text = "-> Delete employee <-"
         print("_" * 105, "\n", text.center(105))
         print("_" * 105, "\n")
         print("Enter the employee_id:\n")

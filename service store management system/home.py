@@ -20,13 +20,12 @@ class Home:
     # User-defined function to display homepage
     @staticmethod
     def dashboard(user_id=""):
-        text = "- > home < -"
+        text = "-> home< -"
         print("_" * 105, "\n", text.center(105))
         text = "-> Dashboard <-"
         print("_" * 105, "\n", text.center(105))
         name = Home.fetch_name(user_id)
         role = Home.check_user_role(user_id)
-        # print(name, "  signed in @", Service.get_timestamp(3).strftime("%d-%m-%Y"), " " * 50, Service.get_timestamp(4))
         if role == 'ADMIN':
             Home.admin_side_dashboard(user_id, name)
         elif role == 'CUSTOMER':
@@ -162,7 +161,8 @@ class Home:
     @staticmethod
     def greeting():
         user_id = ""
-        print("_" * 105, "\n\t\t\t\t\t\t\t- > Welcome to the Application < -")
+        text = '-> Welcome to the Application <-'
+        print("_" * 105, "\n",text.center(105))
         print("_" * 105, "\n")
         prompt = "\nExisting User ?\n\t1.Yes\t2.No\n"
         valid_choice = [1, 2]

@@ -242,7 +242,8 @@ class Service:
     # User-defined function to rise a detailed service request
     @staticmethod
     def rise_request(__customer_id=""):
-        print("_" * 105, "\n\t\t\t\t\t\t\t\t\t- > Service initiation < -")
+        text = "-> Service initiation <-"
+        print("_" * 105, "\n",text.center(105))
         print("_" * 105)
         time = Service.get_timestamp(2)
         device_name = Service.get_device_name()
