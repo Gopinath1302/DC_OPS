@@ -10,7 +10,7 @@ import time
 from serviceitems import Service
 from user import User
 import re
-from DB_connection import query_execute
+from DB_connection import query_execute ,loading_animation
 
 
 class Payment:
@@ -170,7 +170,7 @@ class Payment:
         result = query_execute(3, query, values)
         if result is not None:
             print("Please wait we are redirecting your bank server")
-            time.sleep(5)
+            loading_animation(6, word=None)
             print("Enter username for your internet banking: ")
             username = input()
             print("Enter password for your internet banking: ")
@@ -180,7 +180,7 @@ class Payment:
                 pin = Payment.get_pin()
                 status = Payment.validate_pin(pin)
                 if status:
-                    time.sleep(7)
+                    loading_animation(2,word=None)
                     print("Thank you For your purchase, visit again")
                 else:
                     print("You have entered An incorrect pin\n")
@@ -202,10 +202,11 @@ class Payment:
         status = Payment.get_card_number()
         status = Payment.get_expiry_date()
         status = Payment.get_ccv()
-        time.sleep(5)
+        loading_animation(6, word=None)
         Payment.print_total(total)
         pin = Payment.get_pin()
         status = Payment.validate_pin(pin)
+        loading_animation(2, word=None)
         if status:
             print("The transaction has been completed successfully and will be updated in the dashboard later")
         else:
@@ -219,14 +220,12 @@ class Payment:
         status = Payment.get_upi_id()
         status = Payment.get_pin()
         print("Please wait we are redirecting your bank server")
-        print("Loading....")
-        time.sleep(7)
+        loading_animation(6, word=None)
         Payment.print_total(total)
         pin = Payment.get_pin()
         status = Payment.validate_pin(pin)
         if status:
-            print("Loading....")
-            time.sleep(7)
+            loading_animation(2, word=None)
             print("Thank you For your purchase, visit again")
         else:
             print("You have entered an in valid pin!")

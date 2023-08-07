@@ -10,7 +10,8 @@ from user import User, Customer, Admin
 from serviceitems import Service
 from payment import Payment
 from payment import Bill
-from DB_connection import query_execute, check_db, close_db_connection
+from DB_connection import query_execute, check_db, close_db_connection,loading_animation
+
 
 
 class Home:
@@ -87,13 +88,17 @@ class Home:
                  "\n5.Make your payment\n6.Notifications\n7.Sign off\n"
         user_choices = User.get_user_choice(prompt, valid_choice)
         if user_choices == 1:
+            loading_animation(1,'fetching data ')
             User.print_user_details(user_id)
         elif user_choices == 2:
             User.update_user_details(user_id)
+            loading_animation(1, 'commiting changes')
         elif user_choices == 3:
             Service.rise_service_request(user_id, name)
+            loading_animation(1,'uploading data')
             # Service.rise_request(user_id)
         elif user_choices == 4:
+            loading_animation(1, 'fetching data ')
             Bill().print_details(name, user_id)
         elif user_choices == 5:
             total = Bill.calculate_total(user_id)

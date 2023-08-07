@@ -7,7 +7,7 @@
 
 
 import re
-from DB_connection import global_cursor, query_execute
+from DB_connection import global_cursor, query_execute, loading_animation
 from datetime import date, datetime
 import hashlib
 
@@ -211,6 +211,7 @@ class User:
                 timestamp = User.get_timestamp(2)
                 values = (door_no, street, city, state, country, zip_code, timestamp, __user_id)
                 query_execute(2, query, values)
+                loading_animation(1, word='Uploding data')
                 print("\n", "-" * 25, ">Successfully updated the User Information<", "-" * 25, "\n")
             elif user_choice == 6:
                 break
@@ -253,6 +254,7 @@ class User:
                     quit()
             else:
                 if credentials == hash_value:
+                    loading_animation(6, word=None)
                     text = "logged-in successfully!"
                     print(text.center(105))
                     return __customer_id
@@ -427,6 +429,7 @@ class Customer(User):
         query = "insert into address values(%s,%s,%s,%s,%s,%s,%s,%s);"
         values = (customer_id, None, None, None, None, None, None, timestamp)
         query_execute(1, query, values)
+        loading_animation(1,'upload data')
         print("\n", "-" * 25, ">Successfully registered as the User<", "-" * 25)
 
 
@@ -507,6 +510,7 @@ class Admin(User):
 
         # Uploading the user's details inside the database
         if flag is None:
+            loading_animation(2, word=None)
             text = "\n" + "-" * 34 + "-> Failed create an employee <-" + "-" * 34
             print(text.center(105))
         else:
@@ -523,7 +527,9 @@ class Admin(User):
             query = "insert into address values(%s, %s, %s, %s, %s, %s, %s, %s);"
             values = (__employee_id, None, None, None, None, None, None, timestamp)
             query_execute(1, query, values)
-            text = "\n" + "-" * 34 + "-> Successfully created an employee <-" + "-" * 34
+            loading_animation(1, word='Uploading data')
+            print("\n")
+            text =  "-" * 34 + "-> Successfully created an employee <-" + "-" * 34
             print(text.center(105))
 
     # overidden function to view employee's list

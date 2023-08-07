@@ -7,6 +7,9 @@
 
 
 import mysql.connector
+import sys
+import time
+
 
 connection = mysql.connector.connect(
     host="localhost",
@@ -102,3 +105,60 @@ def query_execute(case, query, values):
 def close_db_connection():
     global_cursor.close()
     connection.close()
+
+import sys
+import time
+
+
+def loading_animation(case,word):
+    animation_chars1 = ["[                   ]", "[█                  ]", "[██                 ]",
+                        "[███                ]", "[████               ]", "[█████              ]",
+                        "[██████             ]", "[███████            ]", "[████████           ]",
+                        "[█████████          ]", "[██████████         ]", "[███████████        ]",
+                        "[████████████       ]", "[█████████████      ]", "[██████████████     ]",
+                        "[███████████████    ]", "[████████████████   ]", "[█████████████████  ]",
+                        "[██████████████████ ]", "[███████████████████]", "complete!"]  # 21
+    animation_chars2 = [ '.', '..', '...', '....', '.', '..', '...', '....', "complete!"]  # 9
+    animation_chars3 = ['◜', '◝', '◞', '◟', '◠', '◡', '𐤏', "complete!"]  # 8
+    animation_chars4 = ['🕛', '🕐', '🕑', '🕒', '🕓', '🕔', '🕕', '🕖', '🕗', '🕘', '🕙', '🕚', "complete!"]  # 13
+    animation_chars5 = ['◕', '◒', '◑', '◓', '◐', '◔', '◖', '◗', '●', "complete!"]  # 10
+    animation_chars6 = ['⌜', '⌝', '⌟', '⌞', "complete!"]  # 5
+    if word is None:
+        word ='Loading'
+    # 21 seconds
+    if case == 1:
+        for i in range(21):
+            sys.stdout.write("\r" +word+" " + animation_chars1[i])
+            sys.stdout.flush()
+            time.sleep(1)
+    # 6 seconds
+    if case == 2:
+        for i in range(9):
+            sys.stdout.write("\r" + word+" "+ animation_chars2[i])
+            sys.stdout.flush()
+            time.sleep(.25)
+    # 8 seconds
+    if case == 3:
+        for i in range(8):
+            sys.stdout.write("\r" + word+" "+ animation_chars3[i])
+            sys.stdout.flush()
+            time.sleep(1)
+    # 13 seconds
+    if case == 4:
+        for i in range(13):
+            sys.stdout.write("\r" + word+" "+ animation_chars4[i])
+            sys.stdout.flush()
+            time.sleep(1)
+    # 10 seconds
+    if case == 5:
+        for i in range(10):
+            sys.stdout.write("\r" + word+" "+ animation_chars5[i])
+            sys.stdout.flush()
+            time.sleep(1)
+    # 5 seconds
+    if case == 6:
+        for i in range(5):
+            sys.stdout.write("\r" + word+" "+ animation_chars6[i])
+            sys.stdout.flush()
+            time.sleep(1)
+    print("\n")

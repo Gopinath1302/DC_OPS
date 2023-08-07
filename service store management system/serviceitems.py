@@ -79,6 +79,7 @@ class Service:
                 print("\n")
                 Service.add_service(__customer_id, date, timestamp, service_id)
             elif user_choice == 2:
+                loading_animation(1, word='Uploading data')
                 break
 
     # User-defined function to generate a service ID
@@ -86,7 +87,7 @@ class Service:
     def generate_service_id(__customer_id="", name=""):
         name = re.sub(r"\s+", " ", name)
         name = name.upper()
-        value = str(Service.get_timestamp(3))
+        value = str(Service.get_timestamp(4))
         value = value.replace("-", "")
         service_id = "SER" + name[:2] + value[:3:-1]
         return service_id
@@ -128,6 +129,9 @@ class Service:
         # function call for time with current year
         elif case == 6:
             return current_year
+
+
+
 
     # Under development
     # User-defined function to get a validated model name
@@ -216,7 +220,6 @@ class Service:
                 print("Defect description should be between 10 and 200 characters.")
 
         return defect_description
-
 
     # User-defined function to get a device usage
     @staticmethod
@@ -317,8 +320,8 @@ class Service:
     @staticmethod
     def view_service_request():
         query = "select ser_id, cus_id, device, model, defect, usaage, rstatus, time, price, p_status from service_request where  ser_id = %s ;"
-        print("Enter the Service_id to fetch the details\n")
-        service_id = input()
+        # print("Enter the Service_id to fetch the details\n")
+        # service_id = input()
         values =(service_id,)
         result = query_execute(4,query,values)
         if not result:
@@ -329,6 +332,7 @@ class Service:
             for row in result:
                 list1 = row
                 print("Service_Id\t\t\t:",list1[0], "\nCustomer_Id\t\t\t:", list1[1], "\nDevice_category \t:", list1[2],  " \nModel_Name\t\t\t:", list1[3],  "\nDefect_description  :", list1[4], " \nUsage\t\t\t\t:", list1[5],  "\nService_status\t\t:", list1[6], " \nTime\t\t\t\t:", list1[7],  "\nPrice\t\t\t\t: ", list1[8], " \nPayment_status\t\t:", list1[9])
+                return service_id
 
     # User-defined function to assign an employee to service request
     @staticmethod
@@ -353,5 +357,26 @@ class Service:
     # User-defined function for emplyee to self-assign to service request
     @staticmethod
     def self_assign():
-        print("enter the to self assign")
-        pass
+        Service.view_all_service_request(name)
+        # prompt = "Enter the service id to self assign\n"
+        # service_id = input(prompt)
+        service_id = Service.view_service_request()
+        Service.assign_to_service(service_id,name)
+
+    @staticmethod
+    def update_service_status(name):
+        query = "select serviced_by, timestamp from services where service_by = %s;"
+        values = (name,)
+        result = query_execute(3, query, values)
+        if result is None:
+            text = "There is no such new services with the entered Service_id: " + service_id
+            print(text.center(105))
+        elif result[0] is None:
+            # print("assign")
+            values = (name, service_id, result[1])
+            # print(values)
+            query = "update services set serviced_by = %s where service_id = %s and timestamp = %s "
+            query_execute(2, query, values)
+        else:
+            text = "The services with the entered Service_id: " + service_id + ", has been already alloted"
+            print(text.center(105))

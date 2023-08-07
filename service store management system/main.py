@@ -14,5 +14,6 @@ if __name__ == "__main__":
     cus.greeting()
 
 # Modules: 6
-# classes: 5
-# Function: 42
+# Classes: 7
+# Total functions: 632
+# Functions under development:11
