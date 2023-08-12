@@ -10,7 +10,7 @@ import time
 from serviceitems import Service
 from user import User
 import re
-from DB_connection import query_execute ,loading_animation
+from DB_connection import query_execute, loading_animation
 
 
 class Payment:
@@ -18,15 +18,13 @@ class Payment:
     # User-defined function to get user's card cvv number and authenticate it
     @staticmethod
     def get_ccv():
-        status = True
         flag = True
-        ccv = 1
         ccv_pattern = r'^(?!.*(.).*\1)(?!(?:012|123|234|345|456|567|678|789))\d{3}$'
         while flag:
             print("Enter your card's ccv")
             try:
                 ccv = int(input())
-            except:
+            except(TypeError, KeyboardInterrupt):
                 print("Invalid entry")
             else:
                 rule = re.compile(ccv_pattern)
@@ -47,10 +45,8 @@ class Payment:
             print("Enter your Transaction pin")
             try:
                 pin = int(input())
-            except:
+            except (TypeError, KeyboardInterrupt, NameError):
                 print("Invalid pin!\nPlease try to enter a valid pin")
-            else:
-                flag = False
             finally:
                 return pin
 
@@ -105,15 +101,13 @@ class Payment:
     def get_expiry_date():
         status = True
         flag = True
-        valid_month = 1
-        valid_year = 1
         current_year = Service.get_timestamp(6)
         current_month = Service.get_timestamp(5)
         while flag:
             try:
                 print("Enter your card's expiry month")
                 valid_month = int(input())
-            except:
+            except (TypeError, KeyboardInterrupt):
                 print("Invalid entry!")
             else:
                 if 1 <= valid_month < 13 and valid_month >= current_month:
@@ -162,7 +156,6 @@ class Payment:
     # User-defined function to perform online banking process
     @staticmethod
     def online_banking(total):
-        status = False
         print("\nEnter your Bank name")
         bank_name = input()
         query = "select * from bank where bank_name = %s;"
@@ -180,7 +173,7 @@ class Payment:
                 pin = Payment.get_pin()
                 status = Payment.validate_pin(pin)
                 if status:
-                    loading_animation(2,word=None)
+                    loading_animation(2, word=None)
                     print("Thank you For your purchase, visit again")
                 else:
                     print("You have entered An incorrect pin\n")
@@ -236,8 +229,9 @@ class Payment:
     def payment_methods(total):
         text = "-> Payments <-"
         print("_" * 105, "\n", text.center(105))
-        print("_" * 105 )
-        prompt = ("\n1. Net Banking\n2. Credit / Debit card\n3. UPI Payment\n4. Back to Dashboard\nEnter your choice:\n")
+        print("_" * 105)
+        prompt = (
+            "\n1. Net Banking\n2. Credit / Debit card\n3. UPI Payment\n4. Back to Dashboard\nEnter your choice:\n")
         flag = True
         status = True
         valid_choice = [1, 2, 3, 4]

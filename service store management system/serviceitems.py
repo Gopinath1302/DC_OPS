@@ -7,7 +7,7 @@
 
 import re
 from user import User
-from DB_connection import query_execute
+from DB_connection import query_execute, loading_animation
 from datetime import date, datetime
 
 
@@ -17,12 +17,11 @@ class Service:
 
     # User-defined function to check where a user is eligible to get a service or not
     @staticmethod
-    def check_service_eligiblity(customer_id):
-        status = True
+    def check_service_eligible(customer_id):
         query = "Select sum(price) from service where cus_id = %s and p_status = 'Pending';"
-        result = query_execute(3,query,(customer_id,))
+        result = query_execute(3, query, (customer_id,))
         try:
-            if result[0] >10500:
+            if result[0] > 10500:
                 status = True
         except TypeError:
             status = True
@@ -36,6 +35,7 @@ class Service:
     # User-defined function to update a users request into the DB
     @classmethod
     def add_service(cls, __customer_id, date, timestamp, service_id):
+        global service_price, service
         prompt = (
             "Enter the service you need...\n1.Hardware Service\tRs 5000\n2.Software Service\tRs 1500\n3.General "
             "Service\tRs 3000\n")
@@ -57,27 +57,28 @@ class Service:
     # User-defined function to rise a service request
     @staticmethod
     def rise_service_request(__customer_id, name):
-        status = Service.check_service_eligiblity(__customer_id)
+        status = Service.check_service_eligible(__customer_id)
         if not status:
-            print("We are apologizing to say this, ", name, "\nYou already having too many pending bills \nEnsure you pay the pending bills")
+            print("We are apologizing to say this, ", name,
+                  "\nYou already having too many pending bills \nEnsure you pay the pending bills")
             return 0
         text = "-> Service initiation <-"
         print("_" * 105, "\n", text.center(105))
         print("_" * 105, "\n")
         timestamp = Service.get_timestamp(2)
-        date = Service.get_timestamp(3)
+        dates = Service.get_timestamp(3)
         service_id = Service.generate_service_id(__customer_id, name)
         query = "insert into service values ( %s, %s, 'Nominal Service', 1000, %s, %s, 'Pending');"
-        values = (__customer_id, service_id, date, timestamp)
+        values = (__customer_id, service_id, dates, timestamp)
         query_execute(1, query, values)
-        Service.add_service(__customer_id, date, timestamp, service_id)
+        Service.add_service(__customer_id, dates, timestamp, service_id)
         valid_choice = [1, 2]
         prompt = "Want to add another service \n 1.Yes or 2.No\n"
         while True:
             user_choice = User.get_user_choice(prompt, valid_choice)
             if user_choice == 1:
                 print("\n")
-                Service.add_service(__customer_id, date, timestamp, service_id)
+                Service.add_service(__customer_id, dates, timestamp, service_id)
             elif user_choice == 2:
                 loading_animation(1, word='Uploading data')
                 break
@@ -130,25 +131,22 @@ class Service:
         elif case == 6:
             return current_year
 
-
-
-
     # Under development
     # User-defined function to get a validated model name
     @staticmethod
     def get_model_name():
+        global model
         flag = True
-        Model_name = ""
         while flag:
-            model_name = input("Enter the Model name\n")
-            if 0 < len(model_name) < 40:
-                if Service.validate_name(2, model_name):
+            model = input("Enter the Model name\n")
+            if 0 < len(model) < 40:
+                if Service.validate_name(2, model):
                     flag = False
                 else:
                     flag = True
             else:
                 flag = True
-        return model_name
+        return model
 
     # User-defined function to  validated model name
     @staticmethod
@@ -156,10 +154,10 @@ class Service:
         pattern1 = r"^[A-Za-z\- ]+$"
         pattern2 = r"^[A-Za-z0-9\- ]+$"
         if case == 1:
-            rule = re.compile(pattern)
+            rule = re.compile(pattern1)
         else:
             rule = re.compile(pattern2)
-        return re.match(rule, name)
+        result = re.match(rule, name)
         if result is not None:
             return True
         else:
@@ -211,15 +209,15 @@ class Service:
     # User-defined function to get a validated defect details
     @staticmethod
     def get_defect_details():
+        global defect
         flag = True
         while flag:
-            defect_description = input("Explain the faults that encountered while using this device:\n")
-            if len(defect_description) >= 10 and len(defect_description) <= 100:
+            defect = input("Explain the faults that encountered while using this device:\n")
+            if 10 <= len(defect) <= 100:
                 flag = False
             else:
                 print("Defect description should be between 10 and 200 characters.")
-
-        return defect_description
+        return defect
 
     # User-defined function to get a device usage
     @staticmethod
@@ -246,7 +244,7 @@ class Service:
     @staticmethod
     def rise_request(__customer_id=""):
         text = "-> Service initiation <-"
-        print("_" * 105, "\n",text.center(105))
+        print("_" * 105, "\n", text.center(105))
         print("_" * 105)
         time = Service.get_timestamp(2)
         device_name = Service.get_device_name()
@@ -254,7 +252,7 @@ class Service:
         defect_description = Service.get_defect_details()
         usaage = Service.get_device_usage()
         status = 'Initiated'
-        date = Service.get_timestamp(3)
+        dates = Service.get_timestamp(3)
         query = "insert into service_request values(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
         query1 = "insert into services values(%s, %s, %s, %s, %s, %s, %s , %s, %s)"
         service_id = Service.generate_service_id(__customer_id, model_name)
@@ -278,8 +276,8 @@ class Service:
                 elif user_choice == 3:
                     defect_description = Service.get_defect_details()
                 elif user_choice == 4:
-                   usaage =Service.get_device_usage()
-        data = (service_id, __customer_id, device_name, None, date, status, 0, 'Waiting', time)
+                    usaage = Service.get_device_usage()
+        data = (service_id, __customer_id, device_name, None, dates, status, 0, 'Waiting', time)
         values = (
             __customer_id, service_id, device_name, model_name, defect_description, usaage, status, time, 0, 'Pending')
         query_execute(1, query, values)
@@ -306,7 +304,7 @@ class Service:
     @staticmethod
     def view_all_service_request():
         query = "select service_id, cus_id, device_name, price, s_status, sdate from services where s_status = 'Initiated';"
-        result = query_execute(4, query, values= None)
+        result = query_execute(4, query, values=None)
         if not result:
             text = 'There are no new services currently'
             print(text.center(105))
@@ -314,16 +312,17 @@ class Service:
             print("Service_id \t\t Customer_id \t\t Device_name \t  Price \t Service_status   Service_date")
             for row in result:
                 list1 = row
-                print(list1[0], " \t\t ", list1[1], " \t\t ", list1[2],  " \t\t ", list1[3],  " \t ", list1[4], " \t  ", list1[5], )
+                print(list1[0], " \t\t ", list1[1], " \t\t ", list1[2], " \t\t ", list1[3], " \t ", list1[4], " \t  ",
+                      list1[5], )
 
     # User-defined function to view a detailed service request
     @staticmethod
     def view_service_request():
         query = "select ser_id, cus_id, device, model, defect, usaage, rstatus, time, price, p_status from service_request where  ser_id = %s ;"
-        # print("Enter the Service_id to fetch the details\n")
-        # service_id = input()
-        values =(service_id,)
-        result = query_execute(4,query,values)
+        print("Enter the Service_id to fetch the details\n")
+        service_id = input()
+        values = (service_id,)
+        result = query_execute(4, query, values)
         if not result:
             text = "There is no such new services with the entered Service_id: " + service_id
             print(text.center(105))
@@ -331,12 +330,15 @@ class Service:
             # print("Service_id  Customer_id  Device_name \t  Price \t Service_status   Service_date")
             for row in result:
                 list1 = row
-                print("Service_Id\t\t\t:",list1[0], "\nCustomer_Id\t\t\t:", list1[1], "\nDevice_category \t:", list1[2],  " \nModel_Name\t\t\t:", list1[3],  "\nDefect_description  :", list1[4], " \nUsage\t\t\t\t:", list1[5],  "\nService_status\t\t:", list1[6], " \nTime\t\t\t\t:", list1[7],  "\nPrice\t\t\t\t: ", list1[8], " \nPayment_status\t\t:", list1[9])
+                print("Service_Id\t\t\t:", list1[0], "\nCustomer_Id\t\t\t:", list1[1], "\nDevice_category \t:",
+                      list1[2], " \nModel_Name\t\t\t:", list1[3], "\nDefect_description  :", list1[4],
+                      " \nUsage\t\t\t\t:", list1[5], "\nService_status\t\t:", list1[6], " \nTime\t\t\t\t:", list1[7],
+                      "\nPrice\t\t\t\t: ", list1[8], " \nPayment_status\t\t:", list1[9])
                 return service_id
 
     # User-defined function to assign an employee to service request
     @staticmethod
-    def assign_to_service(service_id,name):
+    def assign_to_service(service_id, name):
         query = "select serviced_by, timestamp from services where service_id = %s;"
         values = (service_id,)
         result = query_execute(3, query, values)
@@ -346,25 +348,23 @@ class Service:
             print(text.center(105))
         elif result[0] is None:
             # print("assign")
-            values = (name, service_id,result[1])
+            values = (name, service_id, result[1])
             # print(values)
             query = "update services set serviced_by = %s where service_id = %s and timestamp = %s "
             query_execute(2, query, values)
         else:
-            text = "The services with the entered Service_id: " + service_id + ", has been already alloted"
+            text = "The services with the entered Service_id: " + service_id + ", has been already allowed"
             print(text.center(105))
 
-    # User-defined function for emplyee to self-assign to service request
+    # User-defined function for employee to self-assign to service request
     @staticmethod
-    def self_assign():
-        Service.view_all_service_request(name)
-        # prompt = "Enter the service id to self assign\n"
-        # service_id = input(prompt)
+    def self_assign(name):
+        Service.view_all_service_request()
         service_id = Service.view_service_request()
-        Service.assign_to_service(service_id,name)
+        Service.assign_to_service(service_id, name)
 
     @staticmethod
-    def update_service_status(name):
+    def update_service_status(name, service_id):
         query = "select serviced_by, timestamp from services where service_by = %s;"
         values = (name,)
         result = query_execute(3, query, values)
@@ -378,5 +378,5 @@ class Service:
             query = "update services set serviced_by = %s where service_id = %s and timestamp = %s "
             query_execute(2, query, values)
         else:
-            text = "The services with the entered Service_id: " + service_id + ", has been already alloted"
+            text = "The services with the entered Service_id: " + service_id + ", has been already allowed"
             print(text.center(105))

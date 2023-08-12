@@ -15,5 +15,5 @@ if __name__ == "__main__":
 
 # Modules: 6
 # Classes: 7
-# Total functions: 632
+# Total functions: 63
 # Functions under development:11

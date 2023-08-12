@@ -130,7 +130,6 @@ class User:
     # User-defined function to update User details
     @classmethod
     def update_user_details(cls, __user_id=""):
-        global __username, __email_id, __phone, __first_name, __last_name, __DOB, user_choice, __address
         text = "-> Updation <-"
         print("_" * 105, "\n", text.center(105))
         print("_" * 105, "\n")
@@ -138,8 +137,8 @@ class User:
                  "\n4.Address\n5.Update all details\n6.Back to dashboard\n"
         valid_choices = [1, 2, 3, 4, 5, 6]
         while True:
-            user_choice = User.get_user_choice(prompt, valid_choices)
-            if user_choice == 1:
+            user_choices = User.get_user_choice(prompt, valid_choices)
+            if user_choices == 1:
                 print("Enter the your First name:")
                 __first_name = input()
                 query = "update userdata set fname=%s, timestamp=%s where cus_id=%s;"
@@ -147,7 +146,7 @@ class User:
                 values = (__first_name, timestamp, __user_id)
                 query_execute(2, query, values)
                 print("\n", "-" * 25, ">Successfully updated the User Information<", "-" * 25, "\n")
-            elif user_choice == 2:
+            elif user_choices == 2:
                 print("Enter the your Last name:")
                 __last_name = input()
                 query = "update userdata set lname=%s, timestamp=%s where cus_id=%s;"
@@ -155,7 +154,7 @@ class User:
                 values = (__last_name, timestamp, __user_id)
                 query_execute(2, query, values)
                 print("\n", "-" * 25, ">Successfully updated the User Information<", "-" * 25, "\n")
-            elif user_choice == 3:
+            elif user_choices == 3:
                 print("Enter the Your Date of Birth (YYYY-MM-DD):")
                 __DOB = input()
                 query = "update userdata set dob=%s, timestamp =%s where cus_id=%s;"
@@ -163,7 +162,7 @@ class User:
                 values = (__DOB, timestamp, __user_id)
                 query_execute(2, query, values)
                 print("\n", "-" * 25, ">Successfully updated the User Information<", "-" * 25, "\n")
-            elif user_choice == 4:
+            elif user_choices == 4:
                 print("Enter the Your address:")
                 print("Door no:")
                 door_no = input()
@@ -182,7 +181,7 @@ class User:
                 values = (door_no, street, city, state, country, zip_code, timestamp, __user_id)
                 query_execute(2, query, values)
                 print("\n", "-" * 25, ">Successfully updated the User Information<", "-" * 25, "\n")
-            elif user_choice == 5:
+            elif user_choices == 5:
                 print("Enter the your First name:")
                 __first_name = input()
                 print("Enter the your Last name:")
@@ -211,9 +210,9 @@ class User:
                 timestamp = User.get_timestamp(2)
                 values = (door_no, street, city, state, country, zip_code, timestamp, __user_id)
                 query_execute(2, query, values)
-                loading_animation(1, word='Uploding data')
+                loading_animation(1, word='Uploading data')
                 print("\n", "-" * 25, ">Successfully updated the User Information<", "-" * 25, "\n")
-            elif user_choice == 6:
+            elif user_choices == 6:
                 break
 
     # User-defined function to authenticate the user
@@ -221,7 +220,7 @@ class User:
     def sign_in(cls):
         if global_cursor is None:
             raise Exception("Cursor not initialized. Call create_cursor() first.")
-        global user_choice, __username, __password, __email_id, __phone, __customer_id
+        # global user_choice, __username, __password, __email_id, __phone, __customer_id
         text = "-> Sign-in <-"
         print("_" * 105, "\n", text.center(105))
         print("_" * 105, "\n")
@@ -244,13 +243,12 @@ class User:
                 __customer_id = result[0]
                 credentials = result[2]
                 # print(2)
-            except:
+            except TypeError:
                 # print(3)
                 user_choice = User.get_user_choice(prompt, valid_choice)
                 if user_choice == 1:
                     flag = True
                 elif user_choice == 2:
-                    flag = False
                     quit()
             else:
                 if credentials == hash_value:
@@ -263,7 +261,6 @@ class User:
                     if user_choice == 1:
                         flag = True
                     elif user_choice == 2:
-                        flag = False
                         quit()
 
     # User-defined function to validate an existing user
@@ -363,7 +360,7 @@ class Customer(User):
     __DOB = ""
     user_choice: int = 0
 
-    # overidden function to create a customer
+    # overridden function to create a customer
     @classmethod
     def create_user(cls):
 
@@ -397,7 +394,7 @@ class Customer(User):
         while flag:
             try:
                 phone = int(input("Enter your Mobile number:\n"))
-            except:
+            except(TypeError, KeyboardInterrupt):
                 print("Invalid entry !\nPlease try to enter a valid Mobile number\n")
             else:
                 flag = User.phone_no_validation(phone)
@@ -405,7 +402,6 @@ class Customer(User):
                     print("Invalid Mobile number!\nPlease try  to enter a valid Mobile number\n")
                 else:
                     flag = False
-        flag = True
 
         flag = True
         while flag:
@@ -429,7 +425,7 @@ class Customer(User):
         query = "insert into address values(%s,%s,%s,%s,%s,%s,%s,%s);"
         values = (customer_id, None, None, None, None, None, None, timestamp)
         query_execute(1, query, values)
-        loading_animation(1,'upload data')
+        loading_animation(1, 'upload data')
         print("\n", "-" * 25, ">Successfully registered as the User<", "-" * 25)
 
 
@@ -452,12 +448,11 @@ class Admin(User):
                 return True
         return False
 
-    # overidden function to create a employee
+    # overridden function to create a employee
     @classmethod
     def create_user(cls):
 
         username = ""
-        password = ""
         phone = 1
         email_id = ""
         DOB = ''
@@ -488,7 +483,7 @@ class Admin(User):
         while flag:
             try:
                 phone = int(input("Enter the Mobile number:\n"))
-            except:
+            except (TypeError, KeyboardInterrupt):
                 print("Invalid entry !\nPlease try to enter a valid Mobile number\n")
             else:
                 flag = Admin.phone_no_validation(phone)
@@ -499,7 +494,6 @@ class Admin(User):
 
         flag = True
 
-        flag = True
         while flag:
             email_id = input("Enter the email:\n")
             if User.email_id_validation(email_id):
@@ -529,10 +523,10 @@ class Admin(User):
             query_execute(1, query, values)
             loading_animation(1, word='Uploading data')
             print("\n")
-            text =  "-" * 34 + "-> Successfully created an employee <-" + "-" * 34
+            text = "-" * 34 + "-> Successfully created an employee <-" + "-" * 34
             print(text.center(105))
 
-    # overidden function to view employee's list
+    # overridden function to view employee's list
     @staticmethod
     def view_employees():
         text = "-> Employees list <-"
@@ -549,7 +543,7 @@ class Admin(User):
                 list1 = row
                 print(list1[0], "\t\t\t", list1[1])
 
-    # overidden function to remove an employee
+    # overridden function to remove an employee
     @staticmethod
     def remove_employee():
         text = "-> Delete employee <-"
@@ -578,4 +572,4 @@ class Admin(User):
             print(text.center(105))
         else:
             text = "-> Failed to remove the employee <-"
-
+            print(text.center(105))
