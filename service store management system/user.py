@@ -7,9 +7,11 @@
 
 
 import re
+import hashlib
+import tabulate
+from tabulate import tabulate
 from DB_connection import global_cursor, query_execute, loading_animation
 from datetime import date, datetime
-import hashlib
 
 
 # from pwinput import pwinput
@@ -349,7 +351,7 @@ class User:
 
 
 class Customer(User):
-    __employee_id: str = ""
+    __customer_id = str = ""
     __username: str = ""
     __password: str = ""
     __phone: int = 0
@@ -511,6 +513,7 @@ class Admin(User):
             __employee_id = Admin.generate_user_id(2, username, str(phone))
             date1 = Admin.get_timestamp(3)
             __password = Admin.auto_generate_password(username, DOB)
+            __password = User.generate_sha256_hash(__password)
             query = "insert into credentials values(%s, %s, %s, %s, %s, %s);"
             values = (__employee_id, username, __password, str(phone), email_id, date1)
             query_execute(1, query, values)
@@ -534,14 +537,13 @@ class Admin(User):
         print("_" * 105, "\n")
         query = "select cus_id, username from userdata where cus_id like 'EMP%';"
         result = query_execute(4, query, values=None)
-        if not result:
+        len(result)
+        if len(result):
+            header = ["Employee_id", "Username"]
+            print(tabulate(result, headers=header, tablefmt="grid"))
+        else:
             text = 'There are no employees currently'
             print(text.center(105))
-        else:
-            print("Employee_id\t\t\t Username")
-            for row in result:
-                list1 = row
-                print(list1[0], "\t\t\t", list1[1])
 
     # overridden function to remove an employee
     @staticmethod

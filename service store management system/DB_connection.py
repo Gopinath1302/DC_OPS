@@ -106,9 +106,6 @@ def close_db_connection():
     global_cursor.close()
     connection.close()
 
-import sys
-import time
-
 
 def loading_animation(case,word):
     animation_chars1 = ["[                   ]", "[█                  ]", "[██                 ]",
@@ -119,10 +116,10 @@ def loading_animation(case,word):
                         "[███████████████    ]", "[████████████████   ]", "[█████████████████  ]",
                         "[██████████████████ ]", "[███████████████████]", "complete!"]  # 21
     animation_chars2 = [ '.', '..', '...', '....', '.', '..', '...', '....', "complete!"]  # 9
-    animation_chars3 = ['◜', '◝', '◞', '◟', '◠', '◡', '𐤏', "complete!"]  # 8
+    animation_chars3 = ['◜', ' ◝', ' ◞', '◟ ', '◠', '◡', '𐤏', "complete!"]  # 8
     animation_chars4 = ['🕛', '🕐', '🕑', '🕒', '🕓', '🕔', '🕕', '🕖', '🕗', '🕘', '🕙', '🕚', "complete!"]  # 13
     animation_chars5 = ['◕', '◒', '◑', '◓', '◐', '◔', '◖', '◗', '●', "complete!"]  # 10
-    animation_chars6 = ['⌜', '⌝', '⌟', '⌞', "complete!"]  # 5
+    animation_chars6 = ['⌜ ', ' ⌝', ' ⌟', '⌞ ', "complete!"]  # 5
     if word is None:
         word ='Loading'
     # 21 seconds

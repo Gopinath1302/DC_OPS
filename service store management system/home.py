@@ -17,13 +17,17 @@ class Home:
     name = ""
     user_choices: int = 1
 
-    # User-defined function to display homepage
     @staticmethod
-    def dashboard(user_id=""):
+    def decoration(name):
         text = "-> home< -"
         print("_" * 105, "\n", text.center(105))
         text = "-> Dashboard <-"
         print("_" * 105, "\n", text.center(105))
+        print(name, "  signed in @", Service.get_timestamp(3).strftime("%d-%m-%Y"), " " * 50, Service.get_timestamp(4))
+
+    # User-defined function to display homepage
+    @staticmethod
+    def dashboard(user_id=""):
         name = Home.fetch_name(user_id)
         role = Home.check_user_role(user_id)
         if role == 'ADMIN':
@@ -37,9 +41,9 @@ class Home:
     @staticmethod
     def admin_side_dashboard(user_id, name):
         flag = True
-        print(name, "  signed in @", Service.get_timestamp(3).strftime("%d-%m-%Y"), " " * 50, Service.get_timestamp(4))
+        Home.decoration(name)
         valid_choice = [1, 2, 3, 4, 5]
-        prompt = '\n1.Add employee\n2.Remove employee\n3.View Employees\n4.View stats\n5.Sign out\n'
+        prompt = '\n1.Add employee\n2.Remove employee\n3.View Employees\n4.View stats(Under-development)\n5.Sign out\n'
         user_choice = User.get_user_choice(prompt, valid_choice)
         if user_choice == 1:
             Admin.create_user()
@@ -53,25 +57,31 @@ class Home:
             flag = Home.sign_out(name)
         if flag:
             Home.admin_side_dashboard(user_id, name)
-        pass
 
     # User-defined function to employee side dashboard
     @staticmethod
     def employee_side_dashboard(user_id, name):
         flag = True
-        valid_choice = [1, 2, 3, 4, 5]
-        print(name, "  signed in @", Service.get_timestamp(3).strftime("%d-%m-%Y"), " " * 50, Service.get_timestamp(4))
-        prompt = '\n1.Service request\n2.Update service status\n3.Calculate the service cost\n4.self-assign\n5.Sign out'
+        valid_choice = [1, 2, 3, 4, 5, 6, 7]
+        Home.decoration(name)
+        prompt = '\n1.View pending all service requests\n2.Update service status\n3.Update the service cost\n4.self-assign\n5.View personal details\n6.Update personal details\n7.Sign out\n'
         user_choice = User.get_user_choice(prompt, valid_choice)
         if user_choice == 1:
             Service.view_all_service_request()
         elif user_choice == 2:
-            pass
+            Service.update_service_status(name)
         elif user_choice == 3:
-            pass
+            service_id = Service.update_service_price(name)
+            Bill.auto_update_payment_status(service_id)
         elif user_choice == 4:
-            pass
+            Service.self_assign(name)
         elif user_choice == 5:
+            print("Under development")
+            pass
+        elif user_choice == 6:
+            print("Under development")
+            pass
+        elif user_choice == 7:
             flag = Home.sign_out(name)
         if flag:
             Home.dashboard(user_id)
@@ -81,7 +91,7 @@ class Home:
     def customer_side_dashboard(user_id, name):
         flag = True
         valid_choice = [1, 2, 3, 4, 5, 6, 7]
-        print(name, "  signed in @", Service.get_timestamp(3).strftime("%d-%m-%Y"), " " * 50, Service.get_timestamp(4))
+        Home.decoration(name)
         prompt = "\n1.View your details,\n2.Update your details\n3.Service your device \n4.Your last Service details " \
                  "\n5.Make your payment\n6.Notifications\n7.Sign off\n"
         user_choice = User.get_user_choice(prompt, valid_choice)
@@ -92,9 +102,9 @@ class Home:
             User.update_user_details(user_id)
             loading_animation(1, 'committing changes')
         elif user_choice == 3:
-            Service.rise_service_request(user_id, name)
-            loading_animation(1, 'uploading data')
-            # Service.rise_request(user_id)
+            # Service.rise_service_request(user_id, name)
+            # loading_animation(1, 'uploading data')
+            Service.rise_request(user_id)
         elif user_choice == 4:
             loading_animation(1, 'fetching data ')
             Bill().print_details(name, user_id)
@@ -186,10 +196,17 @@ class Home:
         text = "-> Notifications <-"
         print("_" * 105, "\n", text.center(105))
         print("_" * 105, "\n")
-        prompt = "\t" * 6 + "1.You have a pending bill amount of : Rs "
+        i = 1
         total = Bill.calculate_total(user_id)
+        prompt = str(i) + ".You have a pending bill amount of : Rs " + str(total) + "\n"
+        query = "Select * from services where cus_id = %s and s_status = 'Completed';"
+        result = query_execute(4, query, (user_id,))
         if total is not None:
-            print(prompt, total, "\n")
-            print("please navigate to make your payments to pay the remaining bill\n\n")
+            print(prompt.center(105))
+            i = i + 1
+        if len(result):
+            text = str(i) + ".The service request you rose has been completed\n"
+            print(text.center(105))
         else:
             print("You have no notification")
+        print("please navigate to make your payments to pay the remaining bill\n\n")

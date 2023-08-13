@@ -5,11 +5,10 @@
 # Reviewed by        : Silpa Madhusoodanan
 # Reviewed on        : 20/02/2023
 
-
-import time
+import re
+from tabulate import tabulate
 from serviceitems import Service
 from user import User
-import re
 from DB_connection import query_execute, loading_animation
 
 
@@ -255,17 +254,24 @@ class Bill(Payment):
     # User-defined function to calculate the total price
     @classmethod
     def calculate_total(cls, __customer_id):
-        query = "Select sum(price) from service where cus_id = %s and p_status = 'Pending';"
+        query = "Select sum(price) from services where cus_id = %s and p_status = 'Pending';"
         values = (__customer_id,)
         result = query_execute(3, query, values)
         total = result[0]
         return total
 
+    # User-defined function to auto - update the payment status to the DB when ever the price is updated in the DB
+    @staticmethod
+    def auto_update_payment_status(service_id):
+        query = "update services set  p_status = %s where service_id = %s"
+        values = ('Pending', service_id)
+        query_execute(1, query, values)
+
     # User-defined function to update the payment status to the DB
     @staticmethod
     def update_payment_status(customer_id, status):
         if status:
-            query = "update service set  p_status = %s where cus_id = %s"
+            query = "update services set  p_status = %s where cus_id = %s"
             values = ('Successful', customer_id)
             result = query_execute(1, query, values)
 
@@ -279,14 +285,12 @@ class Bill(Payment):
         print("Name: ", name, "\n")
         print("_" * 40, "\n")
         total = Bill.calculate_total(__customer_id)
-        query = ("Select service_id, service_name, price, p_status from service where cus_id = %s and p_status = "
-                 "'Pending';")
+        # service_id, cus_id, device_name, serviced_by, sdate, s_status, price, p_status, timestamp
+        query = (
+            "Select service_id, device_name, s_status, p_status, timestamp from services where cus_id = %s and p_status = "
+            "'Pending';")
         values = (__customer_id,)
-        print("_" * 68, "\n")
         result = query_execute(4, query, values)
-        print(" Service ID \t\t\t Service \t\t Price \t\t Payment status")
-        print("_" * 68, "\n")
-        for row in result:
-            list1 = row
-            print(" ", list1[0], "\t\t", list1[1], "\t", list1[2], "\t\t", list1[3])
+        header = ["Service ID", "Device", " Service status", "Payment status", "Timestamp"]
+        print(tabulate(result, headers=header, tablefmt="grid"))
         print("\nYour total for last service is Rs", total)

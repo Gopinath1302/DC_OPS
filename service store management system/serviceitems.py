@@ -6,9 +6,11 @@
 # Reviewed on        : 20/02/2023
 
 import re
+import hashlib
 from user import User
 from DB_connection import query_execute, loading_animation
 from datetime import date, datetime
+from tabulate import tabulate
 
 
 class Service:
@@ -85,13 +87,14 @@ class Service:
 
     # User-defined function to generate a service ID
     @staticmethod
-    def generate_service_id(__customer_id="", name=""):
-        name = re.sub(r"\s+", " ", name)
-        name = name.upper()
-        value = str(Service.get_timestamp(4))
-        value = value.replace("-", "")
-        service_id = "SER" + name[:2] + value[:3:-1]
+    def generate_service_id(name, model_name):
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        input_string = f"{name}_{model_name}_{timestamp}"
+        hash_object = hashlib.sha256(input_string.encode())
+        unique_hash = hash_object.hexdigest()[:10]
+        service_id = 'SER' + unique_hash[:7]
         return service_id
+
         # pass
 
     # User-defined function to perform Timestamping
@@ -223,6 +226,7 @@ class Service:
     @staticmethod
     def get_device_usage():
         flag = True
+        usage = ''
         prompt = "How do you use the device ?\n\t1.Minimal\t2.Nominal\t3.Extensive\n"
         valid_choices = [1, 2, 3]
         while flag:
@@ -255,7 +259,7 @@ class Service:
         dates = Service.get_timestamp(3)
         query = "insert into service_request values(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
         query1 = "insert into services values(%s, %s, %s, %s, %s, %s, %s , %s, %s)"
-        service_id = Service.generate_service_id(__customer_id, model_name)
+        service_id = Service.generate_service_id(device_name, model_name)
         print("1.CustomerID:", __customer_id, "\n2.ServiceID:", service_id, "\n3.Device name:", device_name,
               "\n4.Model name:",
               model_name, "\n5.Defect:", defect_description, "\n6.Usage:", usaage, "\n7.Time:", time)
@@ -279,11 +283,12 @@ class Service:
                     usaage = Service.get_device_usage()
         data = (service_id, __customer_id, device_name, None, dates, status, 0, 'Waiting', time)
         values = (
-            __customer_id, service_id, device_name, model_name, defect_description, usaage, status, time, 0, 'Pending')
+            __customer_id, service_id, device_name, model_name, defect_description, usaage, status, time, 0, 'Waiting')
         query_execute(1, query, values)
         query_execute(1, query1, data)
-        print("The service request has been raised. Technicians will get to the linked address and collect the "
-              "device with-in 1 or 2 working days\n so please verify the address\n")
+        print(
+            "The service request has been raised.\nTechnicians will get to the address linked with your account and collect \nthe "
+            "device within 1 or 2 working days,so please verify the address\n")
         query = "Select * from address where cus_id = %s;"
         values = (__customer_id,)
         result = query_execute(3, query, values)
@@ -309,11 +314,9 @@ class Service:
             text = 'There are no new services currently'
             print(text.center(105))
         else:
-            print("Service_id \t\t Customer_id \t\t Device_name \t  Price \t Service_status   Service_date")
-            for row in result:
-                list1 = row
-                print(list1[0], " \t\t ", list1[1], " \t\t ", list1[2], " \t\t ", list1[3], " \t ", list1[4], " \t  ",
-                      list1[5], )
+            headers = ["Service ID", "Customer ID", "Device Name", "Price", "Service_status", "Service date"]
+            print(tabulate(result, headers=headers, tablefmt="grid"))
+            # ("Service_id \t\t Customer_id \t\t Device_name \t  Price \t Service_status   Service_date")
 
     # User-defined function to view a detailed service request
     @staticmethod
@@ -362,9 +365,11 @@ class Service:
         Service.view_all_service_request()
         service_id = Service.view_service_request()
         Service.assign_to_service(service_id, name)
+        text = "The " + service_id + "has been successfully assigned to you"
+        print(text.center(105))
 
     @staticmethod
-    def update_service_status(name, service_id):
+    def update_servicer_status(name, service_id):
         query = "select serviced_by, timestamp from services where service_by = %s;"
         values = (name,)
         result = query_execute(3, query, values)
@@ -380,3 +385,87 @@ class Service:
         else:
             text = "The services with the entered Service_id: " + service_id + ", has been already allowed"
             print(text.center(105))
+
+    @staticmethod
+    def calculate_valid_choice(length):
+        valid_choice = []
+        # print(length)
+        for i in range(length):
+            valid_choice.append(i + 1)
+        return valid_choice
+
+    @staticmethod
+    def get_price():
+        price = 0
+        prompt = "Enter the price to update the service cost\n Rs "
+        flag = True
+        while flag:
+            try:
+                price = int(input(prompt))
+            except (ValueError, TypeError, KeyboardInterrupt):
+                print("invalid entry, try entering a valid amount")
+            else:
+                flag = False
+        return price
+
+    @staticmethod
+    def update_service_price(name):
+        query = "select service_id, timestamp, price, s_status from services where s_status ='Initiated' and serviced_by = %s;"
+        values = (name,)
+        result = query_execute(4, query, values)
+        if len(result):
+            headers = ["Service ID", "Timestamp", "Price", "Service status"]
+            print(tabulate(result, headers=headers, tablefmt="grid"))
+        else:
+            text = "There is no new services at the movement"
+            print(text.center(105))
+            return None
+        prompt = "Select the service request to update the service cost\n"
+        valid_choice = Service.calculate_valid_choice(len(result))
+        user_choice = User.get_user_choice(prompt, valid_choice)
+        row = result[user_choice - 1]
+        service_id = row[0]
+        price = Service.get_price()
+        values = (price, service_id)
+        query = "update services set price = %s where service_id = %s "
+        query_execute(2, query, values)
+        query = "update service_request set price = %s where ser_id = %s "
+        query_execute(2, query, values)
+        text = "The price has been successfully updated"
+        print(text.center(105))
+        return service_id
+
+    @staticmethod
+    def get_service_status():
+        prompt = "select the status to update it\n\t1.In-progress\t\t2.Completed\n"
+        valid_choice = [1, 2]
+        user_choice = User.get_user_choice(prompt, valid_choice)
+        if user_choice == 1:
+            status = 'In-progress'
+        else:
+            status = 'Completed'
+        return status
+
+    @staticmethod
+    def update_service_status(name):
+        query = "select service_id, timestamp, price, s_status from services where s_status ='Initiated' and serviced_by = %s;"
+        values = (name,)
+        prompt = "Select the service requests to update the service status\n"
+        result = query_execute(4, query, values)
+        valid_choice = Service.calculate_valid_choice(len(result))
+        if len(result):
+            headers = ["Service ID", "Timestamp", "Price", "Service status"]
+            print(tabulate(result, headers=headers, tablefmt="grid"))
+        else:
+            text = "There is no new services at the movement"
+            print(text.center(105))
+            return None
+        user_choice = User.get_user_choice(prompt, valid_choice)
+        row = result[user_choice - 1]
+        service_id = row[0]
+        s_status = Service.get_service_status()
+        values = (s_status, service_id)
+        query = "update services set s_status = %s where service_id = %s"
+        query_execute(2, query, values)
+        text = "The service status has been successfully updated"
+        print(text.center(105))

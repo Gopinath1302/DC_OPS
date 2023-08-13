@@ -9,8 +9,8 @@
 from home import Home
 
 # object creation for the class Home
+cus = Home()
 if __name__ == "__main__":
-    cus = Home()
     cus.greeting()
 
 # Modules: 6
