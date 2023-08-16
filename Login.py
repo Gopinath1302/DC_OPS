@@ -73,7 +73,8 @@ class login():
         else:
             return False 
 
-login(username,password)
+Obj=login(username,password)
+Obj.login
 item()
 
 
